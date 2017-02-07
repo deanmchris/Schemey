@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Basic Usage &mdash; Schemey 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Schemey 0.1 documentation" href="index.html"/>
+        <link rel="prev" title="Structure of the source" href="Structure of the source.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Schemey
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="What is schemey.html">What is Schemey?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Structure of the source.html">Structure of the source</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-flags">Command line Flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-repl">Running the REPL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-decompiling-source-files">Compiling &amp; Decompiling source files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executing-a-source-file">Executing a source file</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Schemey</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Basic Usage</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Basic usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="basic-usage">
+<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="command-line-flags">
+<h2>Command line Flags<a class="headerlink" href="#command-line-flags" title="Permalink to this headline">¶</a></h2>
+<p>While it is certainly not necessary to know all possible command line
+flags for Schemey, there are some which are important and it wouldn&#8217;t
+hurt to memorize them.</p>
+<p>Schemey offers several different flags for use on the command line.
+The full list is:</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">-c</span></code> <code class="docutils literal"><span class="pre">--compile</span></code>: Given the path to a source file, compile the source file into</dt>
+<dd>bytecode, and write it to a file. If a second argument is given
+the bytecode will be written to that file, otherwise a file is created
+in the same directory as the source file, and the bytecode is written
+there.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">-d</span></code> <code class="docutils literal"><span class="pre">--decompile</span></code>: Given the path to a compiled bytecode file, decompile the bytecode in</dt>
+<dd>the file, and display a helpful representation of the bytecode structure.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">-e</span></code> <code class="docutils literal"><span class="pre">--execute</span></code>: Given the path to a compiled bytecode file, load in the file and execute it</dt>
+<dd>via the virtual machine.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">-rn</span></code> <code class="docutils literal"><span class="pre">--run</span></code>: Given the path to a bytecode file, compile the file to</dt>
+<dd>bytecode, write the bytecode to a file, load the
+file back in, and run the file via the virtual machine. This
+is basically a combination off the functionality of all the above
+flags.</dd>
+</dl>
+</li>
+<li><code class="docutils literal"><span class="pre">-r</span></code> <code class="docutils literal"><span class="pre">--repl</span></code>: Run the REPL for Schemey(See <em>Running the REPL</em> below).</li>
+<li><code class="docutils literal"><span class="pre">-t</span></code> <code class="docutils literal"><span class="pre">--test</span></code>: Run the tests for the Schemey interpreter.</li>
+</ul>
+</div>
+<div class="section" id="running-the-repl">
+<h2>Running the REPL<a class="headerlink" href="#running-the-repl" title="Permalink to this headline">¶</a></h2>
+<p>The REPL is a powerful feature which allows you to quickly test your
+code, without having to recompile a source file over and over.</p>
+<p>To use the REPL, navigate to the <code class="docutils literal"><span class="pre">Schemey/src/</span></code> directory, in the source
+and run the <code class="docutils literal"><span class="pre">schemey.py</span></code> file. This is the main file of the source code and
+used to run Schemey from the command line. After running the file, the REPL
+will open with a greeting message, some brief instructions on usage, and a prompt
+eg:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go"> C:\Schemey\src&gt; python schemey.py</span>
+<span class="go"> Welcome to the Schemey repl. Type in expressions and press</span>
+<span class="go"> enter to evaluate them, or type in &quot;exit&quot; to quit.</span>
+
+<span class="go">[schemey]&gt;</span>
+</pre></div>
+</div>
+<p>After the REPL is open, you can type in an expression and see it
+evaluated immediately:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">[schemey]&gt; (+ 1 2)</span>
+<span class="go">=&gt; 3</span>
+<span class="go">[schemey]&gt; (+ 1 2 3 4 5 6 7 8 9 10)</span>
+<span class="go">=&gt; 55</span>
+</pre></div>
+</div>
+<p>To &#8220;break&#8221; out of the REPL, you can type in the <code class="docutils literal"><span class="pre">exit</span></code> command. This will return you back
+into the command prompt:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">[schemey]&gt; exit</span>
+
+<span class="go">C:\Schemey\src&gt;</span>
+</pre></div>
+</div>
+<p>The REPL offers the distinct advantage of being able to quickly and easily test expressions,
+and see their results immediately, instead of having to re-compile a source file
+again and again to see the updated changes.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Multi-line expressions(expression which span multiple lines) are currently not allowed in the REPL.
+eg.</p>
+<div class="last highlight-console"><div class="highlight"><pre><span></span><span class="go">[schemey]&gt; (+ 1</span>
+
+<span class="go">At line 1:</span>
+
+<span class="go">(+ 1</span>
+<span class="go">    ^</span>
+
+<span class="go">Unmatched parentheses at end of input</span>
+<span class="go">[schemey]&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="compiling-decompiling-source-files">
+<h2>Compiling &amp; Decompiling source files<a class="headerlink" href="#compiling-decompiling-source-files" title="Permalink to this headline">¶</a></h2>
+<p>As said above, the flags <code class="docutils literal"><span class="pre">-c</span></code> <code class="docutils literal"><span class="pre">--compile</span></code> and <code class="docutils literal"><span class="pre">-d</span></code> <code class="docutils literal"><span class="pre">--decompile</span></code> correspond to
+compiling and decompiling a source file respectively.</p>
+<p>To compile a source file, pass the <code class="docutils literal"><span class="pre">-c</span></code> or <code class="docutils literal"><span class="pre">--compile</span></code> flag to
+<code class="docutils literal"><span class="pre">schemey.py</span></code>, along with <em>at least</em> on argument to the flag which
+is the source file to be compiled. If a second argument is given, the
+bytecode will be written to that path. Otherwise, a file is created with
+the same name as the source file&#8217;s, with a  <code class="docutils literal"><span class="pre">.pcode</span></code> extension.</p>
+<p>To decompile a file into human-readable output, pass the <code class="docutils literal"><span class="pre">-d</span></code> or <code class="docutils literal"><span class="pre">--decompile</span></code>
+flag <code class="docutils literal"><span class="pre">schemey.py</span></code>. One argument is required, which is the path to the compiled
+bytecode file. After de-compilation, a helpful representation of the structure of
+the bytecode file is printed out(the output is actual <code class="docutils literal"><span class="pre">repr(CodeObject())</span></code>. See
+<code class="docutils literal"><span class="pre">bytecode.py</span></code> for the implementation of <code class="docutils literal"><span class="pre">CodeObject</span></code>).</p>
+</div>
+<div class="section" id="executing-a-source-file">
+<h2>Executing a source file<a class="headerlink" href="#executing-a-source-file" title="Permalink to this headline">¶</a></h2>
+<p>There are two ways one can execute a source file.</p>
+<ul>
+<li><p class="first">You can first compile the source file(see <em>Compiling &amp; Decompiling source files</em>),
+then use the <code class="docutils literal"><span class="pre">-e</span></code> or <code class="docutils literal"><span class="pre">--execute</span></code> flags to execute the bytecode file. The one
+argument the two flags take is the path to a bytecode file.</p>
+<p>You might wonder why one would want to compile a program in this manner,
+when they could simply do everything all at once using the <code class="docutils literal"><span class="pre">--run</span></code> flag
+(see below).</p>
+<p>The reason for this design is so SchemeyVM is able to execute bytecode
+compiled by compilers other than the one in this project. In other words,
+this design allows anyone to create a compiler which targets SchemeyVM&#8217;s
+bytecode, and the virtual machine will be able to execute files created
+by those compilers.</p>
+</li>
+<li><p class="first">The second way you can run a source file - and will probably the most common - is
+using the <code class="docutils literal"><span class="pre">-rn</span></code> <code class="docutils literal"><span class="pre">--run</span></code> flags, which require one argument; the path to the
+source file. The source file will then be automatically compiled and executed.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">all output by the virtual machine is directed to <code class="docutils literal"><span class="pre">sys.stdout</span></code>. If you would
+like this changed, the <code class="docutils literal"><span class="pre">VirtualMachine</span></code> class&#8217;s constructor allows you to specify
+an output stream(see <code class="docutils literal"><span class="pre">virtual_machine.py</span></code> for more details).</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="Structure of the source.html" class="btn btn-neutral" title="Structure of the source" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Algerbrex.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

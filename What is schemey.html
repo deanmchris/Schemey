@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>What is Schemey? &mdash; Schemey 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Schemey 0.1 documentation" href="index.html"/>
+        <link rel="next" title="License" href="License.html"/>
+        <link rel="prev" title="Welcome to Schemey’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Schemey
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">What is Schemey?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-can-schemey-be-used-for">What can Schemey be used for?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-scheme-does-schemey-implement">What Scheme does Schemey implement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-the-design-philosophy-behind-schemey">What is the design philosophy behind Schemey?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Structure of the source.html">Structure of the source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic usage.html">Basic Usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Schemey</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>What is Schemey?</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/What is schemey.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="what-is-schemey">
+<h1>What is Schemey?<a class="headerlink" href="#what-is-schemey" title="Permalink to this headline">¶</a></h1>
+<p>Schemey is a subset of the Scheme language written in Python. It currently includes:</p>
+<ul class="simple">
+<li>A compiler from Scheme to Schemey VM bytecode</li>
+<li>An implementation of a stack-based virtual machine called &#8220;Schemey VM&#8221;</li>
+<li>A serializer and deserializer for Schemey VM bytecode</li>
+</ul>
+<p>Schemey was created for self educational purposes. After having become interested in
+language design, I decided that I wanted to implement a functional interpreter/compiler
+for an already existing  language. I had already many times before to implement one, some for
+custom languages others for already existing languages. This time however, I was determined to
+stick with this project, and finish out not matter how long it took.</p>
+<p>I learned several different things during the project, such as:</p>
+<ul class="simple">
+<li>How to create a functional compiler.</li>
+<li>How to create a custom serialization &amp; deserialization API.</li>
+<li>How to implement a functional virtual machine.</li>
+</ul>
+<p>The reason I choose Scheme is because of its simplicity. The overall syntax of Scheme
+is very simple compared to that of other languages, which makes it an excellent choice
+for usage.</p>
+<p>Since the purpose of my project was to educate, I&#8217;ve tried to make my code as
+simple, clean, and easy to understand as possible so that others can come
+along and benefit from it. Also, all code in this project is in public
+domain(see <em>License</em> for more details).</p>
+<div class="section" id="what-can-schemey-be-used-for">
+<h2>What can Schemey be used for?<a class="headerlink" href="#what-can-schemey-be-used-for" title="Permalink to this headline">¶</a></h2>
+<p>As stated above, Schemey was written for educational purposes, and thus, Schemey&#8217;s core
+purpose it to be used to educate. Of course, there are many other ways
+to use Schemey, and I encourage you to explore them.</p>
+<p>One major caveat is however; Schemey is still very, very early in development
+and should not - I repeat - SHOULD NOT be used in production level code and/or
+software.</p>
+</div>
+<div class="section" id="what-scheme-does-schemey-implement">
+<h2>What Scheme does Schemey implement<a class="headerlink" href="#what-scheme-does-schemey-implement" title="Permalink to this headline">¶</a></h2>
+<p>Schemey implements a subset of the [<a class="reference external" href="http://www.schemers.org/Documents/Standards/R5RS/">R5RS</a>] - <em>Revised5 Report on the Algorithmic Language Scheme</em> - standard.
+I had original planned to implement a subset of LISP, but choose Scheme instead.</p>
+<p>However, this project was designed to be usable and modifiable, so extending the functionality of Schemey would
+not be very hard. I do plan however, to occasionally update Schemey(I am not promising anything though).</p>
+</div>
+<div class="section" id="what-is-the-design-philosophy-behind-schemey">
+<h2>What is the design philosophy behind Schemey?<a class="headerlink" href="#what-is-the-design-philosophy-behind-schemey" title="Permalink to this headline">¶</a></h2>
+<p>The two core design philosophies behind Schemey were,
+<em>simplicity</em> and <em>clearness</em>.</p>
+<p>From the very beginning of the project, I already knew that
+I wanted to write clear, easy to understand code. Code that any
+level Python programmer, could understand.</p>
+<p>I wouldn&#8217;t use complex or confusing lines of code, nor would I try to
+squeeze every little drop of performance out of my code. My goal was
+to create a project that was approachable by anyone. In other words,
+<code class="docutils literal"><span class="pre">simplicity</span> <span class="pre">+</span> <span class="pre">clearness</span> <span class="pre">&gt;</span> <span class="pre">performance</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="License.html" class="btn btn-neutral float-right" title="License" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Schemey’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Algerbrex.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
