@@ -11,10 +11,14 @@ be created anew for each specific language.
 from collections import namedtuple
 from _builtins import builtin_map
 
+ADDITIONAL_BUILTIN_CHARS = {'?', '!', '.'}
+GARBAGE_CHARS = {';', ' ', '\n', '\t', '\r'}
+TRUE_OR_FALSE_CHARS = {'t', 'f'}
+
 # Sometimes we need to return the current position
-# the lexer is one to raise an appropriate error. That
+# the lexer is on to raise an appropriate error. That
 # is what this class holds. Whenever there is an error,
-# an instance is returned to the lexer.
+# an instance is returned to the parser.
 Error = namedtuple('Error', 'pos')
 
 
@@ -22,7 +26,7 @@ def is_identifier(char):
     """
     Test if `char` is a valid Scheme identifier.
     """
-    return char.isalnum() or char in builtin_map.keys() or char in ('?', '!', '.')
+    return char.isalnum() or char in builtin_map.keys() or char in ADDITIONAL_BUILTIN_CHARS
 
 
 class Token:
@@ -77,14 +81,14 @@ class Lexer:
         is not known), a LexerError is raised.
         """
         # Continue to skip past garbage characters.
-        while self._get_char(self.pos) in (';', ' ', '\n', '\t', '\r'):
+        while self._get_char(self.pos) in GARBAGE_CHARS:
             self._skip_comments()
             self._skip_whitespace()
 
         if self._get_char(self.pos) is None:
             return None
         char = self.buffer[self.pos]
-        if char == '#' and self.buffer[self.pos + 1] in ('t', 'f'):
+        if char == '#' and self.buffer[self.pos + 1] in TRUE_OR_FALSE_CHARS:
             return self._process_boolean()
         elif char.isdigit():
             return self._process_number()
@@ -104,7 +108,7 @@ class Lexer:
         Skip past all characters which are whitespace.
         """
         while self._get_char(self.pos):
-            if self.buffer[self.pos] in (' ', '\n', '\t', '\r'):
+            if self.buffer[self.pos] in GARBAGE_CHARS[:1]:
                 self.pos += 1
             else:
                 break
