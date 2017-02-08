@@ -4,14 +4,7 @@ builtins.py
 
 An implementation of builtin procedures
 and variables in Scheme.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 import operator as op

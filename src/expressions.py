@@ -10,14 +10,7 @@ the usually Scheme convention.
 
 This module also provides utility functions to aid the compiler
 in evaluating each expression.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 

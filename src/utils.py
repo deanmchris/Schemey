@@ -5,14 +5,7 @@ utils.py
 This module provides a generally utility
 functions for use in various stages of the
 interpreter.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 import struct
 

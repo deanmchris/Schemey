@@ -6,14 +6,7 @@ Implementation of bytecode instructions. Also
 includes the implementation of CodeObjects objects,
 Instruction objects, and the serializer and deserializer
 for the CodeObjects.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 from utils import (pack_integer, unpack_integer, pack_string, unpack_string, Stream)

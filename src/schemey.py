@@ -11,14 +11,6 @@ When running this file, pass in the "--help" or "-h" flag for
 a full list of the command line flags which can be passed in,
 and find out more information.
 
-----------------------------------------
-
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 import argparse

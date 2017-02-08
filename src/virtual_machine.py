@@ -3,14 +3,7 @@ virtual_machine.py
 ----------------------------------------
 
 A virtual machine implementation for Scheme.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 from sys import stdout

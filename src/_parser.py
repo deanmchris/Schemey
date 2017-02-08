@@ -4,14 +4,7 @@ parser.py
 
 Parser for a subset of Scheme. Follows the grammar defined in R5RS
 7.1.2 (External Representations).
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 from lexer import Lexer, TokenTypes, Error

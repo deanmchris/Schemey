@@ -7,14 +7,7 @@ Scheme compiler for Schemey. It takes in one
 or more expressions(a list of Pair objects), and generates
 a code object ready for serialization and/or direct
 execution by the virtual machine.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 from bytecode import *

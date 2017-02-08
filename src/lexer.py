@@ -5,14 +5,7 @@ lexer.py
 A simple lexer based upon the "maximal munch" rule.
 Because of this, the lexer is not generic and must
 be created anew for each specific language.
-----------------------------------------
 
-Algerbrex(c1dea2n@gmail.com)
-
-All code in this module is
-public domain.
-
-Last modified: February 5 2017
 """
 
 from collections import namedtuple
@@ -26,15 +19,17 @@ Error = namedtuple('Error', 'pos')
 
 
 def is_identifier(char):
-    """ Test if `char` is a valid Scheme identifier.
+    """
+    Test if `char` is a valid Scheme identifier.
     """
     return char.isalnum() or char in builtin_map.keys() or char in ('?', '!', '.')
 
 
 class Token:
-    """ A simple Token structure.
-        Contains the token type, value,
-        and the position of the token.
+    """
+    A simple Token structure.
+    Contains the token type, value,
+    and the position of the token.
     """
 
     def __init__(self, token_type, val, pos):
@@ -49,8 +44,9 @@ class Token:
 
 
 class TokenTypes:
-    """ A Structure for each possible type
-        of token.
+    """
+    A Structure for each possible type
+    of token.
     """
     BOOLEAN = 'BOOLEAN'
     NUMBER = 'NUMBER'
@@ -61,20 +57,24 @@ class TokenTypes:
 
 
 class Lexer:
-    """ A simple lexer based upon the "maximal munch" rule.
+    """
+    A simple lexer based upon the "maximal munch" rule.
     """
 
     def __init__(self, buffer):
-        """Initialize the lexer with buffer as input."""
+        """
+        Initialize the lexer with buffer as input.
+        """
         self.buffer = buffer
         self.pos = 0
 
     def next_token(self):
-        """ Return the next token(Which is a token object.)
-            found in the input buffer. None is returned if we've
-            reached the end of the buffer.
-            If a lexing error occurs(The current character
-            is not known), a LexerError is raised.
+        """
+        Return the next token(Which is a token object.)
+        found in the input buffer. None is returned if we've
+        reached the end of the buffer.
+        If a lexing error occurs(The current character
+        is not known), a LexerError is raised.
         """
         # Continue to skip past garbage characters.
         while self._get_char(self.pos) in (';', ' ', '\n', '\t', '\r'):
@@ -119,14 +119,16 @@ class Lexer:
             self.pos += 1
 
     def _process_boolean(self):
-        """ Construct a boolean Token.
+        """
+        Construct a boolean Token.
         """
         retval = Token(TokenTypes.BOOLEAN, self.buffer[self.pos:self.pos + 2], self.pos)
         self.pos += 2
         return retval
 
     def _process_number(self):
-        """ Construct a numeric Token.
+        """
+        Construct a numeric Token.
         """
         endpos = self.pos + 1
         while self._get_char(endpos) and self._get_char(endpos).isdigit():
@@ -136,7 +138,8 @@ class Lexer:
         return retval
 
     def _process_identifier(self):
-        """ Construct an identifier Token.
+        """
+        Construct an identifier Token.
         """
         endpos = self.pos + 1
         while self._get_char(endpos) and is_identifier(self._get_char(endpos)):
@@ -146,21 +149,24 @@ class Lexer:
         return retval
 
     def _process_lparen(self):
-        """ Construct a left parenthesis Token.
+        """
+        Construct a left parenthesis Token.
         """
         retval = Token(TokenTypes.LPAREN, self.buffer[self.pos], self.pos)
         self.pos += 1
         return retval
 
     def _process_rparen(self):
-        """ Construct a right parenthesis Token.
+        """
+        Construct a right parenthesis Token.
         """
         retval = Token(TokenTypes.RPAREN, self.buffer[self.pos], self.pos)
         self.pos += 1
         return retval
 
     def _process_quote(self):
-        """ Construct a quote Token.
+        """
+        Construct a quote Token.
         """
         retval = Token(TokenTypes.QUOTE, self.buffer[self.pos], self.pos)
         self.pos += 1
