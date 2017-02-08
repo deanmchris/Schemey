@@ -128,14 +128,15 @@ def repl(prompt='[schemey]> '):
 
 
 def run_tests():
-    test_filepath = os.getcwd()[:-3] + '\\tests\\test.scm'
+    test_filepath = os.getcwd()[:-4] + '\\tests\\test.scm'
     with open(test_filepath) as f:
         source = f.read()
 
     co = compile_source(source)
     bytecode = Serializer(co).serialize()
 
-    outfile = test_filepath[:-8] + 'test.pcode'
+    directory, filename = ntpath.split(test_filepath)
+    outfile = directory + "/{}.pcode".format(filename[:-4])
     with open(outfile, 'wb') as f:
         f.write(bytecode)
 
@@ -143,9 +144,9 @@ def run_tests():
         bytecode = f.read()
 
     co = Deserializer(bytecode).deserialize()
-    print("---------------------Program------------------------:")
+    print("\n---------------------Program------------------------:\n")
     VirtualMachine().run_code(co)
-    print("---------------------CodeObject-----------------------:")
+    print("\n---------------------CodeObject-----------------------:\n")
     print(repr(co))
 
 
