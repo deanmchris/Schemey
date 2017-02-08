@@ -23,6 +23,7 @@ Last modified: February 5 2017
 
 import argparse
 import os
+import ntpath
 from compiler import compile_source
 from bytecode import Serializer, Deserializer
 from virtual_machine import VirtualMachine, ReplVM
@@ -33,6 +34,9 @@ class FileDoesNotExistsError(Exception):
 
 
 def check_if_file_exists(filepath):
+    """
+    Check if the file at the given path exists.
+    """
     if not os.path.isfile(filepath):
         raise FileDoesNotExistsError("File \"{}\" cannot be found and/or does not exists.".format(filepath))
 
@@ -52,7 +56,8 @@ def compile_file(file, outfile=None):
     bytecode = Serializer(co).serialize()
 
     if not outfile:
-        outfile = os.path.dirname(os.path.abspath(file))
+        directory, filename = ntpath.split(file)
+        outfile = directory + "/{}.pcode".format(filename[:-4])
 
     with open(outfile, 'wb') as f:
         f.write(bytecode)
@@ -96,7 +101,8 @@ def run_file(file):
     co = compile_source(source)
     bytecode = Serializer(co).serialize()
 
-    outfile =  os.path.dirname(os.path.abspath(file))
+    directory, filename = ntpath.split(file)
+    outfile = directory + "/{}.pcode".format(filename[:-4])
     with open(outfile, 'wb') as f:
         f.write(bytecode)
 
