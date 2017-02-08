@@ -14,6 +14,7 @@ from _builtins import builtin_map
 ADDITIONAL_BUILTIN_CHARS = {'?', '!', '.'}
 GARBAGE_CHARS = {';', ' ', '\n', '\t', '\r'}
 TRUE_OR_FALSE_CHARS = {'t', 'f'}
+ADD_OR_SUB_CHARS = {'+', '-'}
 
 # Sometimes we need to return the current position
 # the lexer is on to raise an appropriate error. That
@@ -90,7 +91,7 @@ class Lexer:
         char = self.buffer[self.pos]
         if char == '#' and self.buffer[self.pos + 1] in TRUE_OR_FALSE_CHARS:
             return self._process_boolean()
-        elif char.isdigit():
+        elif char.isdigit() or char in ADD_OR_SUB_CHARS and self.buffer[self.pos + 1].isdigit():
             return self._process_number()
         elif is_identifier(char):
             return self._process_identifier()
@@ -108,7 +109,7 @@ class Lexer:
         Skip past all characters which are whitespace.
         """
         while self._get_char(self.pos):
-            if self.buffer[self.pos] in GARBAGE_CHARS[:1]:
+            if self.buffer[self.pos] in GARBAGE_CHARS:
                 self.pos += 1
             else:
                 break
@@ -185,3 +186,4 @@ class Lexer:
             return self.buffer[pos]
         except IndexError:
             return None
+
