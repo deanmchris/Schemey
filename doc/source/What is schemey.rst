@@ -9,9 +9,9 @@ Schemey is a subset of the Scheme language written in Python. It currently inclu
 
 Schemey was created for self educational purposes. After having become interested in
 language design, I decided that I wanted to implement a functional interpreter/compiler
-for an already existing  language. I had already many times before to implement one, some for
+for an already existing  language. I had already tried many times before to implement one, some for
 custom languages others for already existing languages. This time however, I was determined to
-stick with this project, and finish out not matter how long it took.
+stick with this project, and finish it out not matter how long it took.
 
 I learned several different things during the project, such as:
 
@@ -40,7 +40,7 @@ One major caveat is however; Schemey is still very, very early in development
 and should not - I repeat - SHOULD NOT be used in production level code and/or
 software.
 
-What Scheme does Schemey implement
+What Scheme does Schemey implement?
 ----------------------------------
 
 Schemey implements a subset of the [`R5RS`_] - *Revised5 Report on the Algorithmic Language Scheme* - standard.
