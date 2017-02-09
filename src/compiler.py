@@ -15,7 +15,76 @@ from expressions import *
 from utils import flatten, find_or_append
 from _parser import Parser
 
+
 DEBUG = False
+
+
+class Label:
+    """
+    Implements a class to hold the position
+    of an undefined jump target in the bytecode.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return 'Label(name={})'.format(self.name)
+
+
+def _assemble_codeobject(func_code, label_pos_map, args=[]):
+    """
+    Assemble a CodeObject.
+
+    Instead of creating a separate class for assembling
+    the variable and constants references in CodeObjects,
+    we assemble them on the fly.
+    """
+    code = []
+    constants = []
+    varnames = []
+    for instruction in func_code:
+        if isinstance(instruction, Label):
+            continue
+        elif instruction.opcode == OP_LOAD_CONST:
+            if isinstance(instruction.arg, Pair):
+                constants.append(instruction.arg)
+                arg = len(constants) - 1
+            else:
+                arg = find_or_append(constants, instruction.arg)
+        elif instruction.opcode in (OP_LOAD_VAR, OP_DEF_VAR, OP_SET_VAR):
+            arg = find_or_append(varnames, instruction.arg.value)
+        elif instruction.opcode == OP_DEF_FUNC:
+            # since CodeObjects are assembled "on the fly",
+            # there is no need to recursively assemble them.
+            constants.append(instruction.arg)
+            arg = len(constants) - 1
+        elif instruction.opcode == OP_PROC_CALL:
+            arg = instruction.arg
+        elif instruction.opcode in (OP_JUMP, OP_JUMP_IF_FALSE):
+            arg = label_pos_map[instruction.arg.name]
+        elif instruction.opcode in (OP_POP, OP_RETURN):
+            arg = None
+        else:
+            raise CompilerError("Unknown opcode: {}".format(opcode_to_str(instruction.opcode)))
+        code.append(Instruction(instruction.opcode, arg))
+
+    return CodeObject(code, args, constants, varnames)
+
+
+def _assemble_jump_targets(func_code):
+    """
+    enumerate through the given function code. If a Label is seen,
+    map the labels name to its position. Return the mapping of label
+    names to positions.
+    """
+    label_pos_map = {}
+    pos = 0
+    for instruction in func_code:
+        if isinstance(instruction, Label):
+            label_pos_map[instruction.name] = pos
+        else:
+            pos += 1
+    return label_pos_map
 
 
 class CompilerError(Exception):
@@ -23,7 +92,7 @@ class CompilerError(Exception):
     Compiler error exception
     """
     pass
-    
+
 
 class Compiler:
     """
@@ -34,6 +103,7 @@ class Compiler:
         Create a new compiler object.
         """
         self.expressions = expressions
+        self._curr_label = 0
 
     def compile(self):
         """
@@ -41,7 +111,10 @@ class Compiler:
         Returns a compiled CodeObject.
         """
         compiled_expressions = self._compile_expressions(self.expressions)
-        return self._assemble_codeobject(compiled_expressions, args=[])
+
+        # compute jump targets in top-level code object.
+        jump_targets = _assemble_jump_targets(compiled_expressions)
+        return _assemble_codeobject(compiled_expressions, jump_targets)
 
     def _instruction(self, opcode, arg=None):
         """
@@ -55,6 +128,11 @@ class Compiler:
         instructions.
         """
         return list(flatten(args))
+
+    def _emit_label(self):
+        name = 'label_{}'.format(self._curr_label)
+        self._curr_label += 1
+        return Label(name)
 
     def _compile(self, expr):
         """
@@ -82,6 +160,8 @@ class Compiler:
             return self._compile_begin(begin_body(expr))
         elif is_definition(expr):
             return self._compile_definition(expr)
+        elif is_if(expr):
+            return self._compile_if(expr)
         elif is_proc_call(expr):
             return self._compile_proc_call(expr)
         else:
@@ -110,9 +190,11 @@ class Compiler:
             self._compile_begin(lambda_body(expr)),
             self._instruction(OP_RETURN)
         )
+
+        jump_targets = _assemble_jump_targets(lambda_code)
         return self._instruction(
             OP_DEF_FUNC,
-            self._assemble_codeobject(lambda_code, arglist)
+            _assemble_codeobject(lambda_code, jump_targets, arglist)
         )
 
     def _compile_begin(self, expr):
@@ -154,6 +236,32 @@ class Compiler:
             self._instruction(OP_DEF_VAR, var)
         )
 
+    def _compile_if(self, expr):
+        # Check to see if we have a valid define expression. The 5R5S Scheme standard
+        # allows only then-branches in if expressions, so make sure we have at least that.
+        if len(expand_nested_pairs(expr)) < 3:
+            raise CompilerError("Invalid use of if. Requires at least a then-branch")
+
+        then_branch_jump = self._emit_label()
+        if len(expand_nested_pairs(expr)) > 3:
+            else_branch_jump = self._emit_label()
+            return self._instruction_sequence(
+                self._compile(if_cond(expr)),
+                self._instruction(OP_JUMP_IF_FALSE, then_branch_jump),
+                self._compile(if_then(expr)),
+                self._instruction(OP_JUMP, else_branch_jump),
+                [then_branch_jump],
+                self._compile(if_else(expr)),
+                [else_branch_jump]
+            )
+        else:
+            return self._instruction_sequence(
+                self._compile(if_cond(expr)),
+                self._instruction(OP_JUMP_IF_FALSE, then_branch_jump),
+                self._compile(if_then(expr)),
+                [then_branch_jump]
+            )
+
     def _compile_proc_call(self, expr):
         """
         Compile a scheme procedure call. Otherwise
@@ -167,41 +275,6 @@ class Compiler:
             compiled_op,
             self._instruction(OP_PROC_CALL, len(args))
         )
-
-    def _assemble_codeobject(self, func_code, args):
-        """
-        Assemble a CodeObject.
-
-        Instead of creating a separate class for assembling
-        the variable and constants references in CodeObjects,
-        we assemble them on the fly.
-        """
-        code = []
-        constants = []
-        varnames = []
-        for instruction in func_code:
-            if instruction.opcode == OP_LOAD_CONST:
-                if isinstance(instruction.arg, Pair):
-                    constants.append(instruction.arg)
-                    arg = len(constants) - 1
-                else:
-                    arg = find_or_append(constants, instruction.arg)
-            elif instruction.opcode in (OP_LOAD_VAR, OP_DEF_VAR, OP_SET_VAR):
-                arg = find_or_append(varnames, instruction.arg.value)
-            elif instruction.opcode == OP_DEF_FUNC:
-                # since CodeObjects are assembled "on the fly",
-                # there is no need to recursively assemble them.
-                constants.append(instruction.arg)
-                arg = len(constants) - 1
-            elif instruction.opcode == OP_PROC_CALL:
-                arg = instruction.arg
-            elif instruction.opcode in (OP_POP, OP_RETURN):
-                arg = None
-            else:
-                raise CompilerError("Unknown opcode: {}".format(instruction.opcode))
-            code.append(Instruction(instruction.opcode, arg))
-
-        return CodeObject(code, args, constants, varnames)
 
 
 def compile_source(source):
