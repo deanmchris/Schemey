@@ -249,7 +249,10 @@ class ReplVM(VirtualMachine):
         """
         frame = self._make_frame(code)
         self._run_frame(frame)
-        return self.expr_stack[-1]
+        if self.expr_stack:
+            return self.expr_stack[-1]
+        else:
+            return '<#undef>'
 
     def update_env(self):
         """

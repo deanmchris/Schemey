@@ -114,8 +114,6 @@ def repl(prompt='[schemey]> '):
     vm = ReplVM()
     while True:
         line = input(prompt)
-        while line[0] in ';':
-            line = input(prompt)
         if line == 'exit':
             break
         try:
