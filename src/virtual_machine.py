@@ -10,8 +10,9 @@ from sys import stdout
 from _builtins import builtin_map, Procedure
 from environment import Environment
 from bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
-                      OP_DEF_VAR, OP_DEF_FUNC, OP_PROC_CALL, OP_RETURN, OP_POP,
-                      opcode_to_str)
+                      OP_DEF_VAR, OP_DEF_FUNC, OP_PROC_CALL, OP_RETURN,
+                      OP_POP, OP_JUMP_IF_FALSE, OP_JUMP, opcode_to_str)
+from expressions import Boolean
 
 
 class Closure:
@@ -34,7 +35,7 @@ class Frame:
     call stack.
     """
 
-    def __init__(self, codeobject, environment, prev_frame):
+    def __init__(self, codeobject, environment):
         self.codeobject = codeobject
         self.environment = environment
         self.stack = []
@@ -87,7 +88,7 @@ class VirtualMachine:
         else:
             environment = self._make_standard_env()
         environment.binding.update(args)
-        frame = Frame(code, environment, self.frame)
+        frame = Frame(code, environment)
         return frame
 
     def _push_frame(self, frame):
@@ -148,6 +149,12 @@ class VirtualMachine:
         elif bytecode.opcode == OP_DEF_FUNC:
             closure = Closure(f.codeobject.constants[bytecode.arg], environment)
             self._push(closure)
+        elif bytecode.opcode == OP_JUMP_IF_FALSE:
+            cond = self._pop()
+            if isinstance(cond, Boolean) and cond.value is False:
+                self.frame.instr_pointer = bytecode.arg
+        elif bytecode.opcode == OP_JUMP:
+            self.frame.instr_pointer = bytecode.arg
         elif bytecode.opcode == OP_PROC_CALL:
             proc = self._pop()
             args = [self._pop() for _ in range(bytecode.arg)]

@@ -206,6 +206,14 @@ def is_definition(expr):
     return is_tagged(expr, 'define')
 
 
+def is_if(expr):
+    """
+    Check if the given expression is
+    an if expression.
+    """
+    return is_tagged(expr, 'if')
+
+
 def is_lambda(expr):
     """
     Check if the given expression is a lambda.
@@ -230,6 +238,18 @@ def variable_name(expr):
 
 def variable_value(expr):
     return expr.second.second.first
+
+
+def if_cond(expr):
+    return expr.second.first
+
+
+def if_then(expr):
+    return expr.second.second.first
+
+
+def if_else(expr):
+    return expr.second.second.second.first
 
 
 def lambda_parameters(expr):
