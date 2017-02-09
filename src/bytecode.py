@@ -18,8 +18,10 @@ OP_SET_VAR = 0x02
 OP_DEF_VAR = 0x03
 OP_DEF_FUNC = 0x04
 OP_PROC_CALL = 0x05
-OP_RETURN = 0x06
-OP_POP = 0x07
+OP_JUMP_IF_FALSE = 0x06
+OP_JUMP = 0x07
+OP_RETURN = 0x08
+OP_POP = 0x09
 
 
 _opcode_to_str_map = {
@@ -29,8 +31,10 @@ _opcode_to_str_map = {
     0x03: 'OP_DEF_VAR ',
     0x04: 'OP_DEF_FUNC',
     0x05: 'OP_PROC_CALL',
-    0x06: 'OP_RETURN',
-    0x07: 'OP_POP '
+    0x06: 'OP_JUMP_IF_FALSE',
+    0x07: 'OP_JUMP',
+    0x08: 'OP_RETURN',
+    0x09: 'OP_POP '
 }
 
 
