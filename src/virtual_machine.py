@@ -12,7 +12,7 @@ from environment import Environment
 from bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
                       OP_DEF_VAR, OP_DEF_FUNC, OP_PROC_CALL, OP_RETURN,
                       OP_POP, OP_JUMP_IF_FALSE, OP_JUMP, opcode_to_str)
-from expressions import Boolean
+from expressions import Boolean, Number
 
 
 class Closure:
@@ -57,6 +57,7 @@ class VirtualMachine:
     def __init__(self, output_stream=stdout):
         self.frames = []
         self.frame = None
+        self.return_value = None
         self.output_stream = output_stream
 
     def run_code(self, code):
@@ -78,16 +79,17 @@ class VirtualMachine:
         environment['print'] = Procedure('print', self._print)
         return Environment(environment)
 
-    def _make_frame(self, code, args={}):
+    def _make_frame(self, code, args=None):
         """
         Given a code object, and possible arguments,
         create a Frame object.
         """
+        args = args or {}
+        environment = Environment(args, None)
         if self.frames:
-            environment = self.frame.environment
+            environment.parent_env = self.frame.environment
         else:
-            environment = self._make_standard_env()
-        environment.binding.update(args)
+            environment.parent_env = self._make_standard_env()
         frame = Frame(code, environment)
         return frame
 
@@ -109,90 +111,95 @@ class VirtualMachine:
 
     def _run_frame(self, frame):
         """
-        Execute the current frame until it returns.
-        """
-        self._push_frame(frame)
-        while True:
-            why = self._dispatch()
-            if not self.frame:
-                if not self.frames:
-                    return
-                else:
-                    raise VirtualMachineError("Execution of frame unexpectedly ended: {}".format(frame.codeobject))
-            if why is not None:
-                break
-        self._pop_frame()
-
-    def _dispatch(self):
-        """
         Run the code inside of the current frames code object, until
         it returns(something).
         """
-        f = self.frame
-        if f.instr_pointer >= len(f.codeobject.code):
-            return 'done'
-        environment = f.environment
-        bytecode = f.codeobject.code[f.instr_pointer]
-        f.instr_pointer += 1
+        self._push_frame(frame)
+        while True:
+            instruction = self._get_next_instruction()
+            if instruction is not None:
+                why = self._run_instruction(instruction)
+                if why:
+                    break
+            else:
+                break
+        self._pop_frame()
+        return self.return_value
 
-        if bytecode.opcode == OP_LOAD_CONST:
-            self._push(f.codeobject.constants[bytecode.arg])
-        elif bytecode.opcode == OP_LOAD_VAR:
-            var = environment.lookup_var(f.codeobject.varnames[bytecode.arg])
-            self._push(var)
-        elif bytecode.opcode == OP_SET_VAR:
+    def _run_instruction(self, instruction):
+        codeobject = self.frame.codeobject
+        environment = self.frame.environment
+
+        if instruction.opcode == OP_LOAD_CONST:
+            const = codeobject.constants[instruction.arg]
+            self._push(const)
+        elif instruction.opcode == OP_LOAD_VAR:
+            varname = codeobject.varnames[instruction.arg]
+            val = environment.lookup_var(varname)
+            self._push(val)
+        elif instruction.opcode == OP_SET_VAR:
+            varname = codeobject.varnames[instruction.arg]
             val = self._pop()
-            environment.set_var(f.codeobject.varnames[bytecode.arg], val)
-        elif bytecode.opcode == OP_DEF_VAR:
+            environment.set_var(varname, val)
+        elif instruction.opcode == OP_DEF_VAR:
+            varname = codeobject.varnames[instruction.arg]
             val = self._pop()
-            environment.define_var(f.codeobject.varnames[bytecode.arg], val)
-        elif bytecode.opcode == OP_DEF_FUNC:
-            closure = Closure(f.codeobject.constants[bytecode.arg], environment)
+            environment.define_var(varname, val)
+        elif instruction.opcode == OP_DEF_FUNC:
+            func_codeobject = codeobject.constants[instruction.arg]
+            closure = Closure(func_codeobject, environment)
             self._push(closure)
-        elif bytecode.opcode == OP_JUMP_IF_FALSE:
-            cond = self._pop()
-            if isinstance(cond, Boolean) and cond.value is False:
-                self.frame.instr_pointer = bytecode.arg
-        elif bytecode.opcode == OP_JUMP:
-            self.frame.instr_pointer = bytecode.arg
-        elif bytecode.opcode == OP_PROC_CALL:
+        elif instruction.opcode == OP_PROC_CALL:
             proc = self._pop()
-            args = [self._pop() for _ in range(bytecode.arg)]
+            args = [self._pop() for _ in range(instruction.arg)]
+            args.reverse()
+
             if isinstance(proc, Procedure):
-                retval = proc.apply(*reversed(args))
+                retval = proc.apply(*args)
                 self._push(retval)
             elif isinstance(proc, Closure):
-                # Check if the correct number of arguments is passed in.
+                # Check if the correct number of arguments are passed in.
                 if len(proc.codeobject.args) != len(args):
                     raise VirtualMachineError(
                         "procedure \"{}\" expected {} argument(s), but got {} argument(s) instead.".format(
                             proc.codeobject.name, len(proc.codeobject.args), len(args)
                         ))
+
                 # we need to bind the values passed to this closure, to the argument
                 # names. This way, the closure can properly references the parameters used
                 # inside of its body.
-                vals_bound_to_args = {argname.value: val for argname in proc.codeobject.args for val in args}
-                frame = self._make_frame(proc.codeobject, vals_bound_to_args)
-                self._run_frame(frame)
+                arg_bindings = {}
+                for pos, arg in enumerate(proc.codeobject.args):
+                    arg_bindings[arg.value] = args[pos]
+                frame = self._make_frame(proc.codeobject, arg_bindings)
+                retval = self._run_frame(frame)
+                self._push(retval)
             else:
-                # Sometimes `proc` is not a Procedure,
-                # but a Pair. Deal with those cases, and
-                # find the correct value to display in the
-                # error message.
-                if hasattr(proc, 'value'):
-                    value = proc.value
-                else:
-                    value = proc
-                raise VirtualMachineError("\"{}\" is not a function. Expected a function.".format(value))
-        elif bytecode.opcode == OP_RETURN:
-            retval = self._pop()
-            self._pop_frame()
-            self._push(retval)
-        elif bytecode.opcode == OP_POP:
+                raise VirtualMachineError("{} is not a function.".format(
+                    proc.value if hasattr(proc, 'value') else proc)
+                )
+        elif instruction.opcode == OP_JUMP_IF_FALSE:
+            cond = self._pop()
+            if isinstance(cond, Boolean) and cond.value is False:
+                self.frame.instr_pointer = instruction.arg
+        elif instruction.opcode == OP_JUMP:
+            self.frame.instr_pointer = instruction.arg
+        elif instruction.opcode == OP_RETURN:
+            self.return_value = self._pop()
+            return 'return'
+        elif instruction.opcode == OP_POP:
             if self.frame.stack:
                 self._pop()
         else:
-            raise VirtualMachineError("Unknown opcode: {}".format(opcode_to_str(bytecode.opcode)))
+            raise VirtualMachineError("Unknown bytecode: {}".format(opcode_to_str(instruction.opcode)))
+
+    def _get_next_instruction(self):
+        if self.frame.instr_pointer >= len(self.frame.codeobject.code):
+            return None
+        else:
+            instruction = self.frame.codeobject.code[self.frame.instr_pointer]
+            self.frame.instr_pointer += 1
+            return instruction
 
     def _top(self):
         """
@@ -262,12 +269,12 @@ class ReplVM(VirtualMachine):
         self._push_frame(frame)
         while True:
             self.expr_stack.extend(self.frame.stack)
-            why = self._dispatch()
-            if not self.frame:
-                if not self.frames:
-                    return
-                else:
-                    raise VirtualMachineError("Execution of frame unexpectedly ended: {}".format(frame.codeobject))
-            if why is not None:
+            instruction = self._get_next_instruction()
+            if instruction is not None:
+                why = self._run_instruction(instruction)
+                if why:
+                    break
+            else:
                 break
         self._pop_frame()
+        return self.return_value
