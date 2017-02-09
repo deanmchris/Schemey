@@ -7,6 +7,7 @@ functions for use in various stages of the
 interpreter.
 
 """
+from inspect import signature
 import struct
 
 
@@ -105,3 +106,16 @@ class Stream:
         Advance `self.counter`.
         """
         self.counter += 1
+
+
+def get_number_of_params(func_obj):
+    """
+    Given a function object, get the number of arugments the function
+    takes. return 'postional' if the first parameter is `*args`.
+    """
+    params = list(signature(func_obj).parameters.values())
+    first_param = params[0]
+    if first_param.kind == first_param.VAR_POSITIONAL:
+        return 'positional'
+    else:
+        return len(params)

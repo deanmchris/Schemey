@@ -10,6 +10,7 @@ and variables in Scheme.
 import operator as op
 from functools import reduce
 from expressions import *
+from utils import get_number_of_params
 
 
 class ProcedureError(Exception):
@@ -29,14 +30,26 @@ class Procedure:
         return '#<Procedure {}>'.format(self.name)
 
     def apply(self, *args):
-        try:
-            return self.builtin_proc(*args)
-        except TypeError:
-            raise ProcedureError('Incorrect number of arguments for "{}"'.format(self.name))
+        argc = get_number_of_params(self.builtin_proc)
+        if argc != 'positional' and argc != len(args):
+            raise ProcedureError(
+                'Procedure "{}" expected {} argument(s).'
+                ' Got {} instead'.format(self.name, argc, len(args))
+            )
+        return self.builtin_proc(*args)
+
+
+def check_type(expected_type, objs, msg):
+    # somtimes objs is one object and not a tuple of arugments.
+    # deal with thoses cases by wrapping single objects in a list.
+    objs = objs if isinstance(objs, tuple) else [objs]
+    if any(not isinstance(obj, expected_type) for obj in objs):
+        raise ProcedureError(msg)
 
 
 def arith_op(op_func):
     def op(*args):
+        check_type(Number, args, "Expected numbers only")
         return Number(reduce(op_func, [el.value for el in args]))
     return op
 
@@ -59,23 +72,27 @@ def builtin_cons(obj1, obj2):
 
 
 def builtin_car(pair):
+    check_type(Pair, pair, "Expected pair or list.")
     if pair.first is None:
         raise ProcedureError("attempted car on empty list")
     return pair.first
 
 
 def builtin_cdr(pair):
+    check_type(Pair, pair, "Expected pair or list.")
     if pair.first is None:
         raise ProcedureError("attempted cdr on empty list")
     return pair.second
 
 
 def builtin_set_car(pair, obj):
+    check_type(Pair, pair, "Expected pair or list.")
     pair.first = obj
     return pair
 
 
 def builtin_set_cdr(pair, obj):
+    check_type(Pair, pair, "Expected pair or list.")
     pair.second = obj
     return pair
 
