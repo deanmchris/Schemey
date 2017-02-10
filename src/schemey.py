@@ -119,7 +119,7 @@ def repl(prompt='[schemey]> '):
         try:
             co = compile_source(line)
             expr_repr = repr(vm.run_code(co))
-            if expr_repr != repr('<#undef>'):
+            if expr_repr != repr('<#undef>') and line:
                 print('=> {}'.format(expr_repr))
         except Exception as error:
             print(error.args[0])
