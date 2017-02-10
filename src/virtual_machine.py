@@ -7,12 +7,13 @@ A virtual machine implementation for Scheme.
 """
 
 from sys import stdout
-from _builtins import builtin_map, Procedure
+from _builtins import builtin_map, Procedure, check_type
 from environment import Environment
 from bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
                       OP_DEF_VAR, OP_DEF_FUNC, OP_PROC_CALL, OP_RETURN,
                       OP_POP, OP_JUMP_IF_FALSE, OP_JUMP, opcode_to_str)
-from expressions import Boolean, Number
+from expressions import Boolean, String
+from compiler import compile_source
 
 
 class Closure:
@@ -74,9 +75,10 @@ class VirtualMachine:
         environment = {}
         for name, proc in builtin_map.items():
             environment[name] = Procedure(name, proc)
-        # This builtin requires state in the VM, so it could not
-        # have been defined in builtins.
-        environment['print'] = Procedure('print', self._print)
+        # These builtins require state in the VM, so they could not
+        # have been defined in _builtins.py.
+        environment['print'] = Procedure('print', self._builtin_print)
+        environment['load'] = Procedure('load', self._builtin_load)
         return Environment(environment)
 
     def _make_frame(self, code, args=None):
@@ -224,8 +226,23 @@ class VirtualMachine:
     # state                                                 #
     # ------------------------------------------------------#
 
-    def _print(self, *args):
+    def _builtin_print(self, *args):
         self.output_stream.write(str(args[0]) + '\n')
+        return '<#undef>'
+
+    def _builtin_load(self, string):
+        check_type(String, string, "Filename must be a string")
+        try:
+            with open(string.value) as file:
+                source = file.read()
+        except FileNotFoundError:
+            raise VirtualMachineError('File "{}" could not be located.'.format(string.value))
+
+        # once we have compiled our "imported" source file, execute it.
+        co = compile_source(source)
+        frame = self._make_frame(co)
+        self._run_frame(frame)
+
         return '<#undef>'
 
 
