@@ -251,6 +251,23 @@ def if_then(expr):
 def if_else(expr):
     return expr.second.second.second.first
 
+def definition_value(expr):
+    if isinstance(expr.second.first, Symbol):
+        return expr.second.secodn.first
+    else:
+        # support the formal defintion of lambda's
+        # by extending a lambda from the formal
+        # expression.
+        return make_lambda(expr.second.first.second,
+                           expr.second.second)
+
+
+def definition_variable(expr):
+    if isinstance(expr.second.first, Symbol):
+        return expr.second.first
+    else:
+        return expr.second.first.first
+
 
 def lambda_parameters(expr):
     return expr.second.first
@@ -264,16 +281,13 @@ def lambda_name(expr):
     return expr.first
 
 
+def make_lambda(parameters, body):
+    return Pair(Symbol('lambda'), Pair(parameters, body))
+
+
 def quoted_text(expr):
     return expr.second.first
 
-
-def definition_value(expr):
-    return expr.second.second.first
-
-
-def definition_variable(expr):
-    return expr.second.first
 
 
 def begin_body(expr):
