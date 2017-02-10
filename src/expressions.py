@@ -253,7 +253,7 @@ def if_else(expr):
 
 def definition_value(expr):
     if isinstance(expr.second.first, Symbol):
-        return expr.second.secodn.first
+        return expr.second.second.first
     else:
         # support the formal defintion of lambda's
         # by extending a lambda from the formal
