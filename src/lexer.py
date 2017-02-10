@@ -12,9 +12,10 @@ from collections import namedtuple
 from _builtins import builtin_map
 
 ADDITIONAL_BUILTIN_CHARS = {'?', '!', '.'}
-GARBAGE_CHARS = {';', ' ', '\n', '\t', '\r'}
+GARBAGE_CHARS = {' ', '\n', '\t', '\r'}
 TRUE_OR_FALSE_CHARS = {'t', 'f'}
 ADD_OR_SUB_CHARS = {'+', '-'}
+COMMENT_CHAR = ';'
 
 # Sometimes we need to return the current position
 # the lexer is on to raise an appropriate error. That
@@ -81,15 +82,17 @@ class Lexer:
         If a lexing error occurs(The current character
         is not known), a LexerError is raised.
         """
+        char = self._get_char(self.pos)
+
         # Continue to skip past garbage characters.
-        while self._get_char(self.pos) in GARBAGE_CHARS:
+        while char in GARBAGE_CHARS or char == COMMENT_CHAR:
             self._skip_comments()
             self._skip_whitespace()
+            char = self._get_char(self.pos)
 
-        if self._get_char(self.pos) is None:
+        if char is None:
             return None
-        char = self.buffer[self.pos]
-        if char == '#' and self.buffer[self.pos + 1] in TRUE_OR_FALSE_CHARS:
+        elif char == '#' and self.buffer[self.pos + 1] in TRUE_OR_FALSE_CHARS:
             return self._process_boolean()
         elif char.isdigit() or char in ADD_OR_SUB_CHARS and self.buffer[self.pos + 1].isdigit():
             return self._process_number()
@@ -118,10 +121,9 @@ class Lexer:
         """
         Skip past all characters in the comment.
         """
-        if self._get_char(self.pos) != ';':
-            return
-        while self._get_char(self.pos) and self._get_char(self.pos) != '\n':
-            self.pos += 1
+        if self._get_char(self.pos) == COMMENT_CHAR:
+            while self._get_char(self.pos) and self._get_char(self.pos) != '\n':
+                self.pos += 1
 
     def _process_boolean(self):
         """
@@ -186,4 +188,3 @@ class Lexer:
             return self.buffer[pos]
         except IndexError:
             return None
-
