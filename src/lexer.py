@@ -55,6 +55,7 @@ class TokenTypes:
     of token.
     """
     BOOLEAN = 'BOOLEAN'
+    STRING = 'STRING'
     NUMBER = 'NUMBER'
     IDENTIFIER = 'IDENTIFIER'
     LPAREN = 'LPAREN'
@@ -82,20 +83,22 @@ class Lexer:
         If a lexing error occurs(The current character
         is not known), a LexerError is raised.
         """
-        char = self._get_char(self.pos)
+        char = self._get_char()
 
         # Continue to skip past garbage characters.
         while char in GARBAGE_CHARS or char == COMMENT_CHAR:
             self._skip_comments()
             self._skip_whitespace()
-            char = self._get_char(self.pos)
+            char = self._get_char()
 
         if char is None:
             return None
-        elif char == '#' and self.buffer[self.pos + 1] in TRUE_OR_FALSE_CHARS:
+        elif char == '#' and self._get_char(self.pos + 1) in TRUE_OR_FALSE_CHARS:
             return self._process_boolean()
-        elif char.isdigit() or char in ADD_OR_SUB_CHARS and self.buffer[self.pos + 1].isdigit():
+        elif char.isdigit() or char in ADD_OR_SUB_CHARS and self._get_char(self.pos + 1).isdigit():
             return self._process_number()
+        elif char == '"':
+            return self._process_string()
         elif is_identifier(char):
             return self._process_identifier()
         elif char == '(':
@@ -111,8 +114,8 @@ class Lexer:
         """
         Skip past all characters which are whitespace.
         """
-        while self._get_char(self.pos):
-            if self.buffer[self.pos] in GARBAGE_CHARS:
+        while self._get_char():
+            if self._get_char() in GARBAGE_CHARS:
                 self.pos += 1
             else:
                 break
@@ -121,8 +124,8 @@ class Lexer:
         """
         Skip past all characters in the comment.
         """
-        if self._get_char(self.pos) == COMMENT_CHAR:
-            while self._get_char(self.pos) and self._get_char(self.pos) != '\n':
+        if self._get_char() == COMMENT_CHAR:
+            while self._get_char() and self._get_char() != '\n':
                 self.pos += 1
 
     def _process_boolean(self):
@@ -142,6 +145,22 @@ class Lexer:
             endpos += 1
         retval = Token(TokenTypes.NUMBER, self.buffer[self.pos:endpos], self.pos)
         self.pos = endpos
+        return retval
+
+    def _process_string(self):
+        """
+        Construct a string token.
+        """
+        endpos = self.pos + 1
+        while self._get_char(endpos) != '"':
+            # If we've reached EOF, or hit a newline then
+            # this is an unterminated string. Return an error
+            # with the position of where the string began.
+            if not self._get_char(endpos) or self._get_char(endpos) == '\n':
+                return Error(self.pos)
+            endpos += 1
+        retval = Token(TokenTypes.STRING, self.buffer[self.pos + 1:endpos], self.pos)
+        self.pos = endpos + 1
         return retval
 
     def _process_identifier(self):
@@ -179,12 +198,13 @@ class Lexer:
         self.pos += 1
         return retval
 
-    def _get_char(self, pos):
+    def _get_char(self, pos=None):
         """
         Try and get the next character from the buffer.
         If an IndexError is raised, return None.
         """
+        offset = pos or self.pos
         try:
-            return self.buffer[pos]
+            return self.buffer[offset]
         except IndexError:
             return None

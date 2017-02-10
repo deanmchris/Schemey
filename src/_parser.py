@@ -8,7 +8,7 @@ Parser for a subset of Scheme. Follows the grammar defined in R5RS
 """
 
 from lexer import Lexer, TokenTypes, Error
-from expressions import Pair, Number, Symbol, Boolean, Nil
+from expressions import Pair, Number, Symbol, String, Boolean, Nil
 
 
 class ParserError(Exception):
@@ -154,7 +154,10 @@ class Parser:
             retval = Number(int(self.token.val))
         elif self.token.token_type == TokenTypes.IDENTIFIER:
             retval = Symbol(self.token.val)
+        elif self.token.token_type == TokenTypes.STRING:
+            retval = String(self.token.val)
         else:
             self._error("Unexpected token: {}".format(self.token.val))
         self._get_token()
         return retval
+

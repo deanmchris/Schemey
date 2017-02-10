@@ -85,7 +85,24 @@ class Symbol:
         else:
             return self.value == other
 
-    
+
+class String:
+    """
+    String objects represent strings in scheme.
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __repr__(self):
+        return '"{}"'.format(self.value)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.value == other.value
+        else:
+            return self.value == other
+
+
 class Boolean:
     """
     Boolean objects represent the booleans values in Scheme.
@@ -183,7 +200,7 @@ def is_const(expr):
     """
     Check if the expression is a constant value.
     """
-    return isinstance(expr, (Number, Boolean))
+    return isinstance(expr, (Number, Boolean, String))
 
 
 def is_variable(expr):
