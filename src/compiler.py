@@ -162,6 +162,8 @@ class Compiler:
             return self._compile_definition(expr)
         elif is_if(expr):
             return self._compile_if(expr)
+        elif is_cond(expr):
+            return self._compile(make_ifs_from_cond(cond_clauses(expr)))
         elif is_proc_call(expr):
             return self._compile_proc_call(expr)
         else:

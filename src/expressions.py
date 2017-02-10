@@ -118,6 +118,13 @@ class Nil:
         return False
 
 
+class ExpressionError(Exception):
+    """
+    An error to raise if an expression is
+    not syntactically valid.
+    """
+
+
 def expand_nested_pairs(pair, recursive=False):
     """
     Expand nested pair objects, into a flat Python list.
@@ -140,6 +147,16 @@ def expand_nested_pairs(pair, recursive=False):
     return lst
 
 
+def make_nested_pairs_from_seq(*args):
+    """
+    Given a list of arguments, creates a list in Scheme representation
+    (nested Pairs).
+    """
+    if not args:
+        return Nil()
+    return Pair(args[0], make_nested_pairs_from_seq(*args[1:]))
+
+
 def is_scheme_expression(expr):
     """
     Is the given expression a valid Scheme expression.
@@ -149,7 +166,7 @@ def is_scheme_expression(expr):
 
 def is_tagged(expr, tag):
     """
-    Check if the given expression's .first attrbute is
+    Check if the given expression's .first attribute is
     equal to the given tag.
     """
     return expr.first == tag
@@ -214,6 +231,10 @@ def is_if(expr):
     return is_tagged(expr, 'if')
 
 
+def is_cond(expr):
+    return is_tagged(expr, 'cond')
+
+
 def is_lambda(expr):
     """
     Check if the given expression is a lambda.
@@ -251,11 +272,12 @@ def if_then(expr):
 def if_else(expr):
     return expr.second.second.second.first
 
+
 def definition_value(expr):
     if isinstance(expr.second.first, Symbol):
         return expr.second.second.first
     else:
-        # support the formal defintion of lambda's
+        # support the formal definition of lambda's
         # by extending a lambda from the formal
         # expression.
         return make_lambda(expr.second.first.second,
@@ -285,9 +307,59 @@ def make_lambda(parameters, body):
     return Pair(Symbol('lambda'), Pair(parameters, body))
 
 
+def cond_actions(clause):
+    return clause.second
+
+
+def cond_clauses(expr):
+    return expr.second
+
+
+def make_ifs_from_cond(clauses):
+    """
+    Given a cond expression, convert to a chain of if
+    expressions.
+    """
+    # if there are not clauses, return #f
+    if isinstance(clauses, Nil):
+        return Boolean(False)
+
+    first = clauses.first
+    rest = clauses.second
+
+    if is_tagged(first, Symbol('else')):
+        if isinstance(rest, Nil):
+            return sequence_to_expression(cond_actions(first))
+        else:
+            raise ExpressionError('"else" is not the last expression '
+                                  'in cond: {}'.format(repr(clauses)))
+    else:
+        return make_if(
+            cond=first.first,
+            then=sequence_to_expression(cond_actions(first)),
+            _else=make_ifs_from_cond(rest)
+        )
+
+
+def make_if(cond, then, _else):
+    return make_nested_pairs_from_seq(Symbol('if'), cond, then, _else)
+
+
+def sequence_to_expression(exprs):
+    """
+    Convert a list of expressions to a single expression.
+    Add a begin expression if it is more than one expression.
+    """
+    if isinstance(exprs, Nil):
+        return Nil()
+    elif isinstance(exprs.second, Nil):
+        return exprs.first
+    else:
+        return Pair(Symbol('begin'), exprs)
+
+
 def quoted_text(expr):
     return expr.second.first
-
 
 
 def begin_body(expr):
