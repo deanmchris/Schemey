@@ -142,7 +142,7 @@ class Parser:
         """
         self._consume(TokenTypes.QUOTE)
         datum = self._datum()
-        return Pair(Symbol('quote'), Pair(datum, None))
+        return Pair(Symbol('quote'), Pair(datum, Nil()))
 
     def _simple_datum(self):
         """
