@@ -164,14 +164,15 @@ def expand_nested_pairs(pair, recursive=False):
     return lst
 
 
-def make_nested_pairs_from_seq(*args):
+def make_nested_pairs_from_seq(args):
     """
     Given a list of arguments, creates a list in Scheme representation
     (nested Pairs).
     """
-    if not args:
-        return Nil()
-    return Pair(args[0], make_nested_pairs_from_seq(*args[1:]))
+    cdr = Nil()
+    for arg in reversed(args):
+        cdr = Pair(arg, cdr)
+    return cdr
 
 
 def is_scheme_expression(expr):
@@ -249,7 +250,17 @@ def is_if(expr):
 
 
 def is_cond(expr):
+    """
+    Check if the given expression is a cond macro.
+    """
     return is_tagged(expr, 'cond')
+
+
+def is_let(expr):
+    """
+    Check if the given expression is a let macro.
+    """
+    return is_tagged(expr, 'let')
 
 
 def is_lambda(expr):
@@ -359,7 +370,7 @@ def make_ifs_from_cond(clauses):
 
 
 def make_if(cond, then, _else):
-    return make_nested_pairs_from_seq(Symbol('if'), cond, then, _else)
+    return make_nested_pairs_from_seq([Symbol('if'), cond, then, _else])
 
 
 def sequence_to_expression(exprs):
@@ -373,6 +384,51 @@ def sequence_to_expression(exprs):
         return exprs.first
     else:
         return Pair(Symbol('begin'), exprs)
+
+
+def let_bindings(expr):
+    return expr.second.first
+
+
+def let_body(expr):
+    return expr.second.second
+
+
+# The "let" macro has the form:
+#
+#    (let ((id expr) ...) body ...+)
+#
+# To correctly compile this expression, we
+# must first convert to a lambda expression.
+# for example, the "let" expression:
+#
+#    (let ((a 1) (b 2)) (list a b))
+#
+# can be converted into the lambda expression:
+#
+#    ((lambda (a b) (list a b)) 1 2)
+#
+
+def make_let_into_lambda(expr):
+    bindings = expand_nested_pairs(let_bindings(expr))
+    body = let_body(expr)
+
+    # to construct the lambda properly, we need to extract the
+    # bindings names, and values into two separate list.
+    args = []
+    vals = []
+    for pair in bindings:
+        args.append(pair.first)
+        vals.append(pair.second.first)
+
+    # after we've extracted the arguments for lambda
+    # convert them back to a pair.
+    args = make_nested_pairs_from_seq(args)
+    vals = make_nested_pairs_from_seq(vals)
+
+    _lambda = Pair(Symbol("lambda"), Pair(args, body))
+    expanded_lambda = Pair(_lambda, vals)
+    return expanded_lambda
 
 
 def quoted_text(expr):
