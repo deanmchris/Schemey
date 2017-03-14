@@ -3,10 +3,9 @@ test cases_utils.py
 ----------------------------------------
 
 A file that implements utility functions and classes to
-load anf run test files.
+load and run test cases.
 """
 
-import sys
 import os
 from io import StringIO
 
@@ -28,7 +27,6 @@ def all_test_cases(path_to_tests='all_tests', path_to_expected_results='all_test
     for test_file in os.listdir(path_to_tests):
         for expected_results_file in os.listdir(path_to_expected_results):
             yield test_file, expected_results_file
-
 
 
 def run_all_test_cases(runner):
@@ -60,9 +58,3 @@ def run_all_test_cases(runner):
     print('{} tests ran.'.format(number_of_tests))
     print('{} of the tests ran ok.'.format(number_of_tests - fail_count))
     print('{} of the tests failed'.format(fail_count))
-
-
-
-
-
-
