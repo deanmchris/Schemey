@@ -21,12 +21,22 @@ class TestCase:
         self.expected = expected
 
 
-def all_test_cases(path_to_tests='all_tests', path_to_expected_results='all_tests_expected_results'):
+def percentage(part, whole):
     """
+    Calculate the percentage of a number.
     """
-    for test_file in os.listdir(path_to_tests):
-        for expected_results_file in os.listdir(path_to_expected_results):
-            yield test_file, expected_results_file
+    return 100 * float(part)/float(whole)
+
+
+def all_test_cases(path_to_tests='all_tests/', path_to_expected_results='all_tests_expected_results/'):
+    """
+    Yield each test case.
+    """
+    test_files = sorted(os.listdir(path_to_tests))
+    expected_result_files = sorted(os.listdir(path_to_expected_results))
+
+    for test_file, expected_results_file in zip(test_files, expected_result_files):
+            yield path_to_tests + test_file, path_to_expected_results + expected_results_file
 
 
 def run_all_test_cases(runner):
@@ -48,13 +58,14 @@ def run_all_test_cases(runner):
 
         out_stream = StringIO()
         runner(test_case.code, out_stream)
-
         if out_stream.getvalue() == test_case.expected:
-            print('Test {} ran OK'.format(test_case.name))
+            print('Test [{}] ran OK'.format(test_case.name))
         else:
             fail_count += 1
-            print('Test {} Failed'.format(test_case.name))
-
-    print('{} tests ran.'.format(number_of_tests))
-    print('{} of the tests ran ok.'.format(number_of_tests - fail_count))
-    print('{} of the tests failed'.format(fail_count))
+            print('Test [{}] Failed'.format(test_case.name))
+    print('------------------------------------------\n')
+    print('{} test(s) ran.'.format(number_of_tests))
+    print('{}[{}%] of the tests ran ok.'.format(number_of_tests - fail_count,
+                                                percentage(number_of_tests - fail_count, number_of_tests)))
+    print('{}[{}%] of the tests failed'.format(fail_count,
+                                               percentage(fail_count, number_of_tests)))
