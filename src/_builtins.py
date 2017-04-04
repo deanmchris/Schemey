@@ -156,6 +156,10 @@ def builtin_is_null(obj):
     return Boolean(isinstance(obj, Nil))
 
 
+def builtin_is_string(obj):
+    return Boolean(isinstance(obj, String))
+
+
 builtin_map = {
     'eq?': builtin_eqv,
     'eqv?': builtin_eqv,
@@ -165,6 +169,7 @@ builtin_map = {
     'symbol?': builtin_is_symbol,
     'number?': builtin_is_number,
     'null?': builtin_is_null,
+    'string?': builtin_is_string,
 
     '+': arith_op(op.add),
     '-': arith_op(op.sub),
