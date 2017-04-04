@@ -46,7 +46,7 @@ def _assemble_codeobject(func_code, label_pos_map, args=[]):
         if isinstance(instruction, Label):
             continue
         elif instruction.opcode == OP_LOAD_CONST:
-            if isinstance(instruction.arg, Pair):
+            if isinstance(instruction.arg, (Pair, String)):
                 constants.append(instruction.arg)
                 arg = len(constants) - 1
             else:

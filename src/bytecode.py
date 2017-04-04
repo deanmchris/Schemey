@@ -9,8 +9,8 @@ for the CodeObjects.
 
 """
 
-from utils import (pack_integer, unpack_integer, pack_string, unpack_string, Stream)
-from expressions import Pair, Symbol, Number, Boolean, Nil
+from utils import pack_integer, unpack_integer, pack_string, unpack_string, Stream
+from expressions import Pair, Symbol, Number, Boolean, Nil, String
 
 OP_LOAD_CONST = 0x00
 OP_LOAD_VAR = 0x01
@@ -132,6 +132,7 @@ TYPE_NUMBER = b'N'
 TYPE_SYMBOL = b'S'
 TYPE_SEQUENCE = b'['
 TYPE_STRING = b's'
+TYPE_PY_STRING = b'p'
 TYPE_NIL = b'n'
 
 MAGIC_CONSTANT = 0x01A
@@ -172,6 +173,8 @@ class Serializer:
         elif isinstance(value, Symbol):
             return self._serialize_symbol(value)
         elif isinstance(value, str):
+            return self._serialize_py_string(value)
+        elif isinstance(value, String):
             return self._serialize_string(value)
         elif isinstance(value, Nil):
             return self._serialize_nil(value)
@@ -193,7 +196,7 @@ class Serializer:
         """
         co = value or self.co
         stream = TYPE_CODEOBJECT
-        stream += self._serialize_string(co.name)
+        stream += self._serialize_py_string(co.name)
         stream += self._serialize_sequence(co.args)
         stream += self._serialize_sequence(co.code)
         stream += self._serialize_sequence(co.constants)
@@ -236,17 +239,23 @@ class Serializer:
         """
         Serialize a (Python)list of objects. This is similar to
         serializing strings or Symbols, with the difference being
-        that wee record the actual Python lists length, and not its
+        that we record the actual Python lists length, and not its
         bytecode form.
         """
         stream = b''.join(self._serialize_object(el) for el in value)
         return TYPE_SEQUENCE + pack_integer(len(value)) + stream
 
-    def _serialize_string(self, value):
+    def _serialize_py_string(self, value):
         """
         Serialize a Python string object.
         """
-        return TYPE_STRING + pack_string(value)
+        return TYPE_PY_STRING + pack_string(value)
+
+    def _serialize_string(self, value):
+        """
+        Serialize a Scheme string object.
+        """
+        return TYPE_STRING + pack_string(value.value)
 
     def _serialize_nil(self, value):
         """
@@ -315,6 +324,8 @@ class Deserializer:
             return self._deserialize_number()
         elif obj_type == TYPE_SYMBOL:
             return self._deserialize_symbol()
+        elif obj_type == TYPE_PY_STRING:
+            return self._deserialize_py_string()
         elif obj_type == TYPE_STRING:
             return self._deserialize_string()
         elif obj_type == TYPE_NIL:
@@ -328,7 +339,7 @@ class Deserializer:
         """
         self._match(TYPE_CODEOBJECT, "Top-level object is not a code object.")
         co = CodeObject([], [], [], [])
-        co.name = self._deserialize_string()
+        co.name = self._deserialize_py_string()
         co.args = self._deserialize_sequence()
         co.code = self._deserialize_sequence()
         co.constants = self._deserialize_sequence()
@@ -380,13 +391,18 @@ class Deserializer:
         seq_len = unpack_integer(self.stream.read(4))
         return [self._deserialize_object() for _ in range(seq_len)]
 
-    def _deserialize_string(self):
+    def _deserialize_py_string(self):
         """
         Deserialize a Python string.
         """
-        self._match(TYPE_STRING)
+        self._match(TYPE_PY_STRING)
         str_len = unpack_integer(self.stream.read(4))
         return unpack_string(self.stream.read(str_len))
+
+    def _deserialize_string(self):
+        self._match(TYPE_STRING)
+        str_len = unpack_integer(self.stream.read(4))
+        return String(unpack_string(self.stream.read(str_len)))
 
     def _deserialize_nil(self):
         """
