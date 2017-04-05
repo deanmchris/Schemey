@@ -83,7 +83,7 @@ class CodeObject:
     """
 
     def __init__(self, code, args, constants, varnames, name=''):
-        self.name = name
+        self.name = name or 'Anonymous procedure'
         self.code = code
         self.args = args
         self.constants = constants
@@ -94,7 +94,7 @@ class CodeObject:
         prefix = ' ' * indent
 
         repr_ += prefix + '---------------\n'
-        repr_ += prefix + ('Procedure: ' + self.name + '\n' if self.name else 'Anonymous procedure' + '\n')
+        repr_ += prefix + 'Procedure: ' + self.name + '\n'
         repr_ += prefix + 'Arguments: ' + str(self.args) + '\n'
         repr_ += prefix + 'Variables referenced: ' + str(self.varnames) + '\n'
 
