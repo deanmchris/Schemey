@@ -40,8 +40,8 @@ class Procedure:
 
 
 def check_type(expected_type, objs, msg):
-    # somtimes objs is one object and not a tuple of arugments.
-    # deal with thoses cases by wrapping single objects in a list.
+    # sometimes `objs` is one object and not a tuple of arguments.
+    # deal with theses cases by wrapping single objects in a list.
     objs = objs if isinstance(objs, tuple) else [objs]
     if any(not isinstance(obj, expected_type) for obj in objs):
         raise ProcedureError(msg)
@@ -95,6 +95,12 @@ def builtin_set_cdr(pair, obj):
     check_type(Pair, pair, "Expected pair or list.")
     pair.second = obj
     return pair
+
+
+def builtin_string_length(string):
+    check_type(String, string, "Expected string.")
+    str_len = len(string.value)
+    return Number(str_len)
 
 
 def builtin_eqv(*args):
@@ -192,4 +198,6 @@ builtin_map = {
     'cdr': builtin_cdr,
     'set-car!': builtin_set_car,
     'set-cdr!': builtin_set_cdr,
+
+    'string-length': builtin_string_length,
 }
