@@ -106,16 +106,50 @@ class CodeObject:
                 constants.append(('\n    ' + prefix) + repr(constant))
         repr_ += prefix + 'Constants referenced: ' + ''.join(constants) + '\n'
 
-        formatted_code = [('\n    ' + prefix) + repr(el) for el in self.code]
+        formatted_code = self._format_code(prefix=prefix)
         repr_ += prefix + 'Code: ' + ''.join(formatted_code) + '\n'
         repr_ += prefix + '---------------\n'
         return repr_
+
+    def _format_code(self, prefix):
+        """
+        Iterate over the opcodes of the class, and
+        "pretty-format" each one.
+        """
+        formatted_code = []
+        for pos, instruction in enumerate(self.code):
+            instr_repr = ('\n    ' + prefix + '({}) '.format(pos)) + repr(instruction)
+
+            if instruction.opcode == OP_LOAD_CONST:
+                instr_repr += ' [{}]'.format(self.constants[instruction.arg])
+            elif instruction.opcode == OP_LOAD_VAR:
+                instr_repr += ' [{}]'.format(self.varnames[instruction.arg])
+            elif instruction.opcode == OP_SET_VAR:
+                instr_repr += ' [{}]'.format(self.varnames[instruction.arg])
+            elif instruction.opcode == OP_DEF_VAR:
+                instr_repr += ' [{}]'.format(self.varnames[instruction.arg])
+            elif instruction.opcode == OP_DEF_FUNC:
+                instr_repr += ' [{}]'.format(self.constants[instruction.arg].name)
+            elif instruction.opcode == OP_PROC_CALL:
+                instr_repr += ' [no args]'
+            elif instruction.opcode == OP_JUMP_IF_FALSE:
+                instr_repr += ' [{}]'.format(instruction.arg)
+            elif instruction.opcode == OP_JUMP:
+                instr_repr += ' [{}]'.format(instruction.arg)
+            elif instruction.opcode == OP_RETURN:
+                instr_repr += ' [no args]'
+            elif instruction.opcode == OP_POP:
+                instr_repr += ' [no args]'
+
+            formatted_code.append(instr_repr)
+
+        return formatted_code
 
 
 """
 What follows is a custom implementation of a simple serialization
 API for CodeObjects. The design is very simple and easy to understand, and is
-based of off CPython's marshalization API and Bobscheme.
+based of off CPython's  and Bobscheme's marshaling API.
 
 Each serialised object is prefixed with a "type" byte which tells the objects
 type, and then the bytecode format of each object.
