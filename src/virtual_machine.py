@@ -68,6 +68,11 @@ class VirtualMachine:
         frame = self._make_frame(code)
         self._run_frame(frame)
 
+    def _make_frame(self, code, arg_bindings=None, environment=None):
+        arg_bindings = arg_bindings or {}
+        environment = environment or self.frame or self._make_standard_env()
+        return Frame(code,  Environment(arg_bindings, environment))
+
     def _make_standard_env(self):
         """
         Create a standard Scheme namespace.
@@ -80,20 +85,6 @@ class VirtualMachine:
         environment['print'] = Procedure('print', self._builtin_print)
         environment['load'] = Procedure('load', self._builtin_load)
         return Environment(environment)
-
-    def _make_frame(self, code, args=None):
-        """
-        Given a code object, and possible arguments,
-        create a Frame object.
-        """
-        args = args or {}
-        environment = Environment(args, None)
-        if self.frames:
-            environment.parent_env = self.frame.environment
-        else:
-            environment.parent_env = self._make_standard_env()
-        frame = Frame(code, environment)
-        return frame
 
     def _push_frame(self, frame):
         """
@@ -173,7 +164,8 @@ class VirtualMachine:
                 arg_bindings = {}
                 for pos, arg in enumerate(proc.codeobject.args):
                     arg_bindings[arg.value] = args[pos]
-                frame = self._make_frame(proc.codeobject, arg_bindings)
+
+                frame = self._make_frame(proc.codeobject, arg_bindings, proc.environment)
                 retval = self._run_frame(frame)
                 self._push(retval)
             else:

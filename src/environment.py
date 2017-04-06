@@ -27,9 +27,8 @@ class Environment:
         in the current environment, but subsequent parent directories may be searched
         for a variable definition.
         """
-        self.binding = {}
         self.parent_env = parent_env
-        self.binding.update(binding)
+        self.binding = binding
 
     def lookup_var(self, varname):
         """
