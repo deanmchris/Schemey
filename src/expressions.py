@@ -94,7 +94,7 @@ class String:
         self.value = value
 
     def __repr__(self):
-        return '"{}"'.format(self.value)
+        return '{}'.format(self.value)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
