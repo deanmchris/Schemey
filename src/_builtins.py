@@ -180,8 +180,8 @@ builtin_map = {
     '+': arith_op(op.add),
     '-': arith_op(op.sub),
     '*': arith_op(op.mul),
-    '/': arith_op(op.floordiv),
-    '%': arith_op(op.mod),
+    'quotient': arith_op(op.floordiv),
+    'modulo': arith_op(op.mod),
 
     '=': comp_op(op.eq),
     '>': comp_op(op.gt),
