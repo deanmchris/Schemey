@@ -15,10 +15,15 @@ and find out more information.
 
 import argparse
 import os
+import sys
 import ntpath
 from compiler import compile_source
 from bytecode import Serializer, Deserializer
 from virtual_machine import VirtualMachine, ReplVM
+
+# our virtual machine is not properly tail recursive. We
+# need to set the recursion limit higher.
+sys.setrecursionlimit(500000)
 
 
 class FileDoesNotExistsError(Exception):
