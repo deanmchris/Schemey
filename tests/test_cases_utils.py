@@ -25,7 +25,7 @@ def percentage(part, whole):
     """
     Calculate the percentage of a number.
     """
-    return 100 * float(part)/float(whole)
+    return round(100 * float(part)/float(whole), 1)
 
 
 def all_test_cases(path_to_tests='all_tests/', path_to_expected_results='all_tests_expected_results/'):
