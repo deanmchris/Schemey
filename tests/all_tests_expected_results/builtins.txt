@@ -1,0 +1,6 @@
+symbol
+number
+string
+pair
+null
+pair
