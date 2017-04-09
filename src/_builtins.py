@@ -56,7 +56,14 @@ def arith_op(op_func):
 
 def comp_op(op_func):
     def op(*args):
-        return Boolean(reduce(op_func, [el.value for el in args]))
+        it = iter(args)
+        value = next(it)
+        for element in it:
+            if op_func(value.value, element.value):
+                value = element
+            else:
+                return Boolean(False)
+        return Boolean(True)
     return op
 
 
@@ -83,6 +90,20 @@ def builtin_cdr(pair):
     if pair.first is None:
         raise ProcedureError("attempted cdr on empty list")
     return pair.second
+
+
+def builtin_cadr(pair):
+    check_type(Pair, pair, "Expected pair of list")
+    if pair.second.first is None:
+        raise ProcedureError("attempted cadr on empty list")
+    return pair.second.first
+
+
+def builtin_caddr(pair):
+    check_type(Pair, pair, "Expected pair of list")
+    if pair.second.second.first is None:
+        raise ProcedureError("attempted caddr on empty list")
+    return pair.second.second.first
 
 
 def builtin_set_car(pair, obj):
@@ -196,6 +217,8 @@ builtin_map = {
     'cons': builtin_cons,
     'car': builtin_car,
     'cdr': builtin_cdr,
+    'cadr': builtin_cadr,
+    'caddr': builtin_caddr,
     'set-car!': builtin_set_car,
     'set-cdr!': builtin_set_cdr,
 
