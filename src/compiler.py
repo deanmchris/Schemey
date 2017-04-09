@@ -243,21 +243,28 @@ class Compiler:
     def _compile_if(self, expr):
         # Check to see if we have a valid define expression. We require a then-branch
         # and else-branch. Any expressions after those are ignored.
-        if len(expand_nested_pairs(expr)) < 4:
-            raise CompilerError("Invalid use of if. Requires a then-branch and else-branch")
+        if len(expand_nested_pairs(expr)) >= 4:
 
-        then_branch_jump = self._emit_label()
-        else_branch_jump = self._emit_label()
+            then_branch_jump = self._emit_label()
+            else_branch_jump = self._emit_label()
 
-        return self._instruction_sequence(
-            self._compile(if_cond(expr)),
-            self._instruction(OP_JUMP_IF_FALSE, then_branch_jump),
-            self._compile(if_then(expr)),
-            self._instruction(OP_JUMP, else_branch_jump),
-            [then_branch_jump],
-            self._compile(if_else(expr)),
-            [else_branch_jump]
-        )
+            return self._instruction_sequence(
+                self._compile(if_cond(expr)),
+                self._instruction(OP_JUMP_IF_FALSE, then_branch_jump),
+                self._compile(if_then(expr)),
+                self._instruction(OP_JUMP, else_branch_jump),
+                [then_branch_jump],
+                self._compile(if_else(expr)),
+                [else_branch_jump]
+            )
+        else:
+            then_branch_jump = self._emit_label()
+            return self._instruction_sequence(
+                self._compile(if_cond(expr)),
+                self._instruction(OP_JUMP_IF_FALSE, then_branch_jump),
+                self._compile(if_then(expr)),
+                [then_branch_jump]
+            )
 
     def _compile_proc_call(self, expr):
         """
