@@ -3,7 +3,6 @@ virtual_machine.py
 ----------------------------------------
 
 A virtual machine implementation for Scheme.
-
 """
 
 from sys import stdout
@@ -14,6 +13,9 @@ from bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
                       OP_POP, OP_JUMP_IF_FALSE, OP_JUMP, opcode_to_str)
 from expressions import Boolean, String
 from compiler import compile_source
+
+
+DEBUG = False
 
 
 class Closure:
@@ -27,7 +29,7 @@ class Closure:
         self.environment = environment
 
     def __repr__(self):
-        return '#<Closure>'
+        return '#<Closure {}>'.format(self.codeobject.name)
 
 
 class Frame:
@@ -41,6 +43,15 @@ class Frame:
         self.environment = environment
         self.stack = []
         self.instr_pointer = 0
+
+    def __repr__(self):
+        """
+        Print current state of Frame(for debugging).
+        """
+        _repr = '\nFrame {}:\n'.format(self.codeobject.name)
+        _repr += '\tinstr_pointer: ' + repr(self.instr_pointer) + '\n'
+        _repr += '\tstack: ' + repr(self.stack) + '\n'
+        return _repr
 
 
 class VirtualMachineError(Exception):
@@ -110,6 +121,16 @@ class VirtualMachine:
         self._push_frame(frame)
         while True:
             instruction = self._get_next_instruction()
+
+            # debug the vm by printing out the data stack,
+            # frame stack, and current instruction(with the
+            # argument).
+            if DEBUG:
+                print('current instruction:', instruction)
+                print('frame stack:', self.frames)
+                print('return value of previous frame:', self.return_value)
+                print('----------------------------------')
+
             if instruction is not None:
                 why = self._run_instruction(instruction)
                 if why:
@@ -179,7 +200,10 @@ class VirtualMachine:
         elif instruction.opcode == OP_JUMP:
             self.frame.instr_pointer = instruction.arg
         elif instruction.opcode == OP_RETURN:
-            self.return_value = self._pop()
+            # make sure the current frame actual has a
+            # return value.
+            if self.frame.stack:
+                self.return_value = self._pop()
             return 'return'
         elif instruction.opcode == OP_POP:
             if self.frame.stack:
