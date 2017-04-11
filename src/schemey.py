@@ -19,8 +19,8 @@ import sys
 import ntpath
 from .compiler import compile_source
 from .bytecode import Serializer, Deserializer
-from .virtual_machine import VirtualMachine, ReplVM
-from tests import test_vm_compiler, test_repl_vm
+from .virtual_machine import VirtualMachine
+from tests import test_vm_compiler
 
 # our virtual machine is not properly tail recursive. We
 # need to set the recursion limit higher.
@@ -111,33 +111,10 @@ def run_file(file):
     VirtualMachine().run_code(co)
 
 
-def repl(prompt='[schemey]> '):
-    """
-    Create a Scheme repl.
-    """
-    print("Welcome to the Schemey repl. Type in expressions and press")
-    print("enter to evaluate them, or type in \"exit\" to quit.\n")
-    vm = ReplVM()
-    while True:
-        line = input(prompt)
-        if line == 'exit':
-            break
-        try:
-            co = compile_source(line)
-            expr_repr = repr(vm.run_code(co))
-            if expr_repr != repr('<#undef>') and line:
-                print('=> {}'.format(expr_repr))
-        except Exception as error:
-            print(error.args[0])
-
-
 def run_tests():
     print('\nVirtual machine & compiler tests:\n')
     vm_runner = test_vm_compiler.runner
     test_vm_compiler.run_all_test_cases(vm_runner)
-    print('\nVirtual machine REPL tests:\n')
-    repl_runner = test_repl_vm.runner
-    test_repl_vm.run_all_test_cases(repl_runner)
 
     
 def main():
@@ -197,10 +174,10 @@ in the source.
     elif args.test:
         run_tests()
     elif args.repl:
-        repl()
+        print('The REPL is not currently implemented in the Schemey version')
     else:
-        # if not arguments are given, the default is to open the REPL.
-        repl()
+        # if not arguments are given, the default is to open the repl
+        print('The REPL is not currently implemented in the Schemey version')
 
 
 if __name__ == '__main__':

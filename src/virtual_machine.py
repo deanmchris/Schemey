@@ -237,7 +237,7 @@ class VirtualMachine:
         """
         self.frame.stack.extend(vals)
 
-    # -------------------------------------------------------#
+    # ------------------------------------------------------#
     # builtin procedures which require access to the VM's   #
     # state                                                 #
     # ------------------------------------------------------#
@@ -258,59 +258,4 @@ class VirtualMachine:
         co = compile_source(source)
         frame = self._make_frame(co)
         self._run_frame(frame)
-
         return '<#undef>'
-
-
-class ReplVM(VirtualMachine):
-    """
-    A subclass of VirtualMachine. This subclass simply implements
-    a way to return the last expression on the last frames stack
-    to implement a repl.
-    """
-
-    def __init__(self):
-        super(ReplVM, self).__init__()
-        self.expr_stack = []
-        self.last_frame = []
-
-    def run_code(self, code):
-        """
-        Since this virtual machine is used to implement a repl,
-        we need to grab the last value from self.expr_stack and
-        return it. That will be the result displayed in the repl.
-        """
-        frame = self._make_frame(code)
-        self._run_frame(frame)
-        if self.expr_stack:
-            return self.expr_stack[-1]
-        else:
-            return '<#undef>'
-
-    def update_env(self):
-        """
-        Reset the virtual machines internals.
-        """
-        curr_frame = {}
-        for prev_frame in self.last_frame:
-            curr_frame.update(prev_frame.environment.binding)
-        return curr_frame
-
-    def _run_frame(self, frame):
-        """
-        Execute the current frame until it returns.
-        """
-        self.last_frame.append(frame)
-        frame.environment.binding = self.update_env()
-        self._push_frame(frame)
-        while True:
-            self.expr_stack.extend(self.frame.stack)
-            instruction = self._get_next_instruction()
-            if instruction is not None:
-                why = self._run_instruction(instruction)
-                if why:
-                    break
-            else:
-                break
-        self._pop_frame()
-        return self.return_value
