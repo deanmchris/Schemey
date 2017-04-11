@@ -10,10 +10,10 @@ execution by the virtual machine.
 
 """
 
-from bytecode import *
-from expressions import *
-from utils import flatten, find_or_append
-from _parser import Parser
+from .bytecode import *
+from .expressions import *
+from .utils import flatten, find_or_append
+from ._parser import Parser
 
 
 DEBUG = False

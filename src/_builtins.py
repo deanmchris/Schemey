@@ -9,8 +9,8 @@ and variables in Scheme.
 
 import operator as op
 from functools import reduce
-from expressions import *
-from utils import get_number_of_params
+from .expressions import *
+from .utils import get_number_of_params
 
 
 class ProcedureError(Exception):

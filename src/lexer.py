@@ -9,7 +9,7 @@ be created anew for each specific language.
 """
 
 from collections import namedtuple
-from _builtins import builtin_map
+from ._builtins import builtin_map
 
 ADDITIONAL_BUILTIN_CHARS = {'?', '!', '.'}
 GARBAGE_CHARS = {' ', '\n', '\t', '\r'}

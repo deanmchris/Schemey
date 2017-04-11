@@ -7,8 +7,8 @@ Parser for a subset of Scheme. Follows the grammar defined in R5RS
 
 """
 
-from lexer import Lexer, TokenTypes, Error
-from expressions import Pair, Number, Symbol, String, Boolean, Nil
+from .lexer import Lexer, TokenTypes, Error
+from .expressions import Pair, Number, Symbol, String, Boolean, Nil
 
 
 class ParserError(Exception):

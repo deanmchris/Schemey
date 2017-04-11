@@ -9,8 +9,8 @@ for the CodeObjects.
 
 """
 
-from utils import pack_integer, unpack_integer, pack_string, unpack_string, Stream
-from expressions import Pair, Symbol, Number, Boolean, Nil, String
+from .utils import pack_integer, unpack_integer, pack_string, unpack_string, Stream
+from .expressions import Pair, Symbol, Number, Boolean, Nil, String
 
 OP_LOAD_CONST = 0x00
 OP_LOAD_VAR = 0x01

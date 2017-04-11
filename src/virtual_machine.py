@@ -6,13 +6,13 @@ A virtual machine implementation for Scheme.
 """
 
 from sys import stdout
-from _builtins import builtin_map, Procedure, check_type
-from environment import Environment
-from bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
+from ._builtins import builtin_map, Procedure, check_type
+from .environment import Environment
+from .bytecode import (OP_LOAD_CONST, OP_LOAD_VAR, OP_SET_VAR,
                       OP_DEF_VAR, OP_DEF_FUNC, OP_PROC_CALL, OP_RETURN,
                       OP_POP, OP_JUMP_IF_FALSE, OP_JUMP, opcode_to_str)
-from expressions import Boolean, String
-from compiler import compile_source
+from .expressions import Boolean, String
+from .compiler import compile_source
 
 
 DEBUG = False

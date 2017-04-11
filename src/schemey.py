@@ -17,9 +17,10 @@ import argparse
 import os
 import sys
 import ntpath
-from compiler import compile_source
-from bytecode import Serializer, Deserializer
-from virtual_machine import VirtualMachine, ReplVM
+from .compiler import compile_source
+from .bytecode import Serializer, Deserializer
+from .virtual_machine import VirtualMachine, ReplVM
+from tests import test_vm_compiler, test_repl_vm
 
 # our virtual machine is not properly tail recursive. We
 # need to set the recursion limit higher.
@@ -131,28 +132,14 @@ def repl(prompt='[schemey]> '):
 
 
 def run_tests():
-    test_filepath = os.getcwd()[:-4] + '\\tests\\test.scm'
-    with open(test_filepath) as f:
-        source = f.read()
+    print('\nVirtual machine & compiler tests:\n')
+    vm_runner = test_vm_compiler.runner
+    test_vm_compiler.run_all_test_cases(vm_runner)
+    print('\nVirtual machine REPL tests:\n')
+    repl_runner = test_repl_vm.runner
+    test_repl_vm.run_all_test_cases(repl_runner)
 
-    co = compile_source(source)
-    bytecode = Serializer(co).serialize()
-
-    directory, filename = ntpath.split(test_filepath)
-    outfile = directory + "/{}.pcode".format(filename[:-4])
-    with open(outfile, 'wb') as f:
-        f.write(bytecode)
-
-    with open(outfile, 'rb') as f:
-        bytecode = f.read()
-
-    co = Deserializer(bytecode).deserialize()
-    print("\n---------------------Program------------------------:\n")
-    VirtualMachine().run_code(co)
-    print("\n---------------------CodeObject-----------------------:\n")
-    print(repr(co))
-
-
+    
 def main():
     """
     The main function in this module. This provides definitions of all the
