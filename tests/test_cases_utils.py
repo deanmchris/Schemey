@@ -28,7 +28,8 @@ def percentage(part, whole):
     return round(100 * float(part)/float(whole), 1)
 
 
-def all_test_cases(path_to_tests='all_tests/', path_to_expected_results='all_tests_expected_results/'):
+def all_test_cases(path_to_tests='tests/all_tests/',
+                   path_to_expected_results='tests/all_tests_expected_results/'):
     """
     Yield each test case.
     """
