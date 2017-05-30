@@ -20,6 +20,8 @@ import ntpath
 from .compiler import compile_source
 from .bytecode import Serializer, Deserializer
 from .virtual_machine import VirtualMachine
+from .interpreter import Interpreter
+from ._parser import Parser
 from tests import test_vm_compiler
 
 # our virtual machine is not properly tail recursive. We
@@ -116,6 +118,26 @@ def run_tests():
     vm_runner = test_vm_compiler.runner
     test_vm_compiler.run_all_test_cases(vm_runner)
 
+
+def run_repl():
+    interpreter = Interpreter(sys.stdout)
+    ln = 0
+
+    while True:
+        code_str = input('[{}]> '.format(ln))
+        if code_str == 'exit': break
+
+        try:
+            exprs = Parser(code_str).parse()
+            if exprs:
+                value = interpreter.run(exprs[0])
+            
+            if value is not None:
+                print('=> {}'.format(value))
+        except Exception as err:
+            print(err.args[0])
+        ln += 1
+
     
 def main():
     """
@@ -174,10 +196,10 @@ in the source.
     elif args.test:
         run_tests()
     elif args.repl:
-        print('The REPL is not currently implemented in the Schemey version')
+        run_repl()
     else:
         # if not arguments are given, the default is to open the repl
-        print('The REPL is not currently implemented in the Schemey version')
+        run_repl()
 
 
 if __name__ == '__main__':
