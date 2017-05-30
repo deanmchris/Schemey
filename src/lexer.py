@@ -14,7 +14,6 @@ from ._builtins import builtin_map
 ADDITIONAL_BUILTIN_CHARS = {'?', '!', '.'}
 GARBAGE_CHARS = {' ', '\n', '\t', '\r'}
 TRUE_OR_FALSE_CHARS = {'t', 'f'}
-ADD_OR_SUB_CHARS = {'+', '-'}
 COMMENT_CHAR = ';'
 
 # Sometimes we need to return the current position
@@ -95,7 +94,7 @@ class Lexer:
             return None
         elif char == '#' and self._get_char(self.pos + 1) in TRUE_OR_FALSE_CHARS:
             return self._process_boolean()
-        elif char.isdigit() or char in ADD_OR_SUB_CHARS and self._get_char(self.pos + 1).isdigit():
+        elif char.isdigit():
             return self._process_number()
         elif char == '"':
             return self._process_string()

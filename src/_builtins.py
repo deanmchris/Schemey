@@ -47,8 +47,10 @@ def check_type(expected_type, objs, msg):
         raise ProcedureError(msg)
 
 
-def arith_op(op_func):
+def arith_op(op_func, unary_func):
     def op(*args):
+        if len(args) == 1:
+            return Number(unary_func(args[0].value))
         check_type(Number, args, "Expected numbers only")
         return Number(reduce(op_func, [el.value for el in args]))
     return op
@@ -159,6 +161,14 @@ def builtin_not(obj):
         return Boolean(False)
 
 
+def builtin_quotient(a, b):
+    return Number(a.value // b.value)
+
+
+def builtin_mod(a, b):
+    return Number(a.value % b.value)
+
+
 def builtin_is_pair(obj):
     return Boolean(isinstance(obj, Pair))
 
@@ -198,11 +208,14 @@ builtin_map = {
     'null?': builtin_is_null,
     'string?': builtin_is_string,
 
-    '+': arith_op(op.add),
-    '-': arith_op(op.sub),
-    '*': arith_op(op.mul),
-    'quotient': arith_op(op.floordiv),
-    'modulo': arith_op(op.mod),
+    '+': arith_op(op.add, lambda x: +x),
+    '-': arith_op(op.sub, lambda x: -x),
+    '*': arith_op(op.mul, lambda x: x),
+    # divison and modulation always need exactly
+    # two arguments. Because of this, we must implement
+    # them as functions instead.
+    'quotient': builtin_quotient,
+    'modulo': builtin_mod,
 
     '=': comp_op(op.eq),
     '>': comp_op(op.gt),
