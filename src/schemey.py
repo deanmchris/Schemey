@@ -22,6 +22,8 @@ from .bytecode import Serializer, Deserializer
 from .virtual_machine import VirtualMachine
 from .interpreter import Interpreter
 from ._parser import Parser
+
+from .context import tests
 from tests import test_vm_compiler
 
 # our virtual machine is not properly tail recursive. We
@@ -39,6 +41,17 @@ def check_if_file_exists(filepath):
     """
     if not os.path.isfile(filepath):
         raise FileDoesNotExistsError("File \"{}\" cannot be found and/or does not exists.".format(filepath))
+
+
+def balenced_parens(string):
+    lparen_cnt = 0
+    rparen_cnt = 0
+    for char in string:
+        if char == '(':
+            lparen_cnt += 1
+        elif char == ')':
+            rparen_cnt += 1
+    return lparen_cnt == rparen_cnt
 
 
 def compile_file(file, outfile=None):
@@ -123,14 +136,23 @@ def run_repl():
     interpreter = Interpreter(sys.stdout)
     ln = 0
 
+    print('Schemey REPL v0.2.1\nenter a scheme expression to evaluate it '
+          'or "exit" to quit.\n')
+
     while True:
         code_str = input('[{}]> '.format(ln))
-        if code_str == 'exit': break
+        while not balenced_parens(code_str):
+            code_str += input('...  ')
+
+        if code_str == 'exit': 
+            break
 
         try:
             exprs = Parser(code_str).parse()
             if exprs:
                 value = interpreter.run(exprs[0])
+            else:
+                value = None
             
             if value is not None:
                 print('=> {}'.format(value))
