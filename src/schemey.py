@@ -20,7 +20,7 @@ import ntpath
 from .compiler import compile_source
 from .bytecode import Serializer, Deserializer
 from .virtual_machine import VirtualMachine
-from .interpreter import Interpreter
+from .interpreter import Interpreter, interpret_expressions
 from ._parser import Parser
 
 from .context import tests
@@ -126,6 +126,16 @@ def run_file(file):
     VirtualMachine().run_code(co)
 
 
+def run_interpreter(file):
+    """
+    Interpret a file
+    """
+    with open(file) as f:
+        source = f.read()
+
+    interpret_expressions(source) 
+
+
 def run_tests():
     print('\nVirtual machine & compiler tests:\n')
     vm_runner = test_vm_compiler.runner
@@ -194,6 +204,8 @@ in the source.
                                                        'bytecode, write the bytecode to a .pcode file, load the'
                                                        'file back in, and run the file via the virtual machine.')
 
+    parser.add_argument('-i', '--interpret', type=str, help='Given the path to a source file name, interpret the file.')
+
     parser.add_argument('-r', '--repl', help='Run the read-eval-print-loop.', action='store_true')
 
     parser.add_argument('-t', '--test', help='Execute the given test files for the interpreter.', action='store_true')
@@ -219,6 +231,9 @@ in the source.
     elif args.run:
         check_if_file_exists(args.run)
         run_file(args.run)
+    elif args.interpret:
+        check_if_file_exists(args.interpret)
+        run_interpreter(args.interpret)
     elif args.test:
         run_tests()
     elif args.repl:
