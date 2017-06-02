@@ -62,7 +62,7 @@ class Interpreter:
         elif is_lambda(expr):
             return self._eval_lambda(expr)
         elif is_begin(expr):
-            return self._eval_begin(expr)
+            return self._eval_begin(begin_body(expr))
         elif is_definition(expr):
             return self._eval_definition(expr)
         elif is_if(expr):
@@ -88,8 +88,7 @@ class Interpreter:
         return closure
 
     def _eval_begin(self, expr):
-        expressions = expand_nested_pairs(expr)
-        return self._eval_sequence(expressions)
+        return self._eval_sequence(expr)
 
     def _eval_definition(self, expr):
         val = self._eval(definition_value(expr))
@@ -99,14 +98,15 @@ class Interpreter:
         self.environment.define_var(var.value, val)
 
     def _eval_if(self, expr):
-        condition = self._eval(if_cond(expr))
-        if condition == Boolean(True):
-            return self._eval(if_then(expr))
-        else:
+        condition = self._eval(if_cond(expr)) 
+        if isinstance(condition, Boolean) and condition.value == False:
+            # Do we have an optional else statement.
             if len(expand_nested_pairs(expr)) >= 4:
                 return self._eval(if_else(expr))
             else:
                 return None
+        else:
+            return self._eval(if_then(expr))
 
     def _eval_proc_call(self, expr):
         args = expand_nested_pairs(procedure_args(expr))

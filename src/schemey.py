@@ -24,7 +24,7 @@ from .interpreter import Interpreter
 from ._parser import Parser
 
 from .context import tests
-from tests import test_vm_compiler
+from tests import test_vm_compiler, test_interpreter
 
 # our virtual machine is not properly tail recursive. We
 # need to set the recursion limit higher.
@@ -130,6 +130,10 @@ def run_tests():
     print('\nVirtual machine & compiler tests:\n')
     vm_runner = test_vm_compiler.runner
     test_vm_compiler.run_all_test_cases(vm_runner)
+    
+    print('\nInterpreter tests:\n')
+    inter_runner = test_interpreter.runner
+    test_interpreter.run_all_test_cases(inter_runner)
 
 
 def run_repl():
