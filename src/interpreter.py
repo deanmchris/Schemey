@@ -79,7 +79,7 @@ class Interpreter:
     def _eval_assignment(self, expr):
         val = self._eval(variable_value(expr))
         name = variable_name(expr)
-        self.enviroment.set_var(name, val)
+        self.environment.set_var(name.value, val)
 
     def _eval_lambda(self, expr):
         args = expand_nested_pairs(lambda_parameters(expr))
