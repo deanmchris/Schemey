@@ -1,4 +1,4 @@
-Schemey v0.2.3
+Schemey v0.2.2
 ==============
 
 ![schemey](https://cloud.githubusercontent.com/assets/24984542/26615530/17a961ea-458d-11e7-8da3-1977979b30a9.gif)
