@@ -11,7 +11,7 @@ setup(
     description=DESCRIPTION,
     author="Eli Bendersky",
     author_email="eliben@gmail.com",
-    version='1.0.0',
+    version='0.2.2',
     packages=find_packages(),
     license='PD',
     entry_points={
