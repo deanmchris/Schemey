@@ -9,8 +9,7 @@ Schemey is a suite for the Scheme language in written in pure Python'''
 setup(
     name='Schemey',
     description=DESCRIPTION,
-    author="Eli Bendersky",
-    author_email="eliben@gmail.com",
+    author="Christian Dean",
     version='0.2.2',
     packages=find_packages(),
     license='PD',
